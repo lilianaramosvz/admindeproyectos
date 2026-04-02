@@ -1,0 +1,26 @@
+/*frontend\src\styles\theme.css*/
+:root {
+  /* backgrounds */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --shadow-md:
+    rgba(0, 0, 0, 0.128) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+
+  /* borders */
+  --border-light: #dcdfe5;
+
+  /* text */
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+
+  /* colors */
+  --blue: #6ca2f8;
+  --green: #54d6aa;
+  --purple: #cb95fd;
+  --orange: #f7a163;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+}

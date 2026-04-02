@@ -1,0 +1,42 @@
+/*frontend\src\styles\components\dashboard\SprintBoard.module.css*/
+.wrapper {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.board {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.column {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.columnTitle {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.task {
+  margin-top: 12px;
+  font-size: 13px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
