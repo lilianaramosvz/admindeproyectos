@@ -1,0 +1,100 @@
+/*frontend\src\styles\components\layout\Sidebar.module.css*/
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-light);
+  padding: 24px 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.brandBlock {
+  margin-bottom: 24px;
+}
+
+.brandLabel {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.brandName {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.navList {
+  list-style: none;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.navLink {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text-primary);
+  text-decoration: none;
+  background: var(--bg-secondary);
+}
+
+.navLink:hover {
+  background: #eef2f7;
+}
+
+.navLinkActive {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--purple);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.email {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.separator {
+  border: 0;
+  border-top: 1px solid var(--border-light);
+  margin: 16px 0;
+}
+
+.profileSection {
+  margin-top: auto;
+}
+
+.profileRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}

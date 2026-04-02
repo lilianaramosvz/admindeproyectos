@@ -1,0 +1,110 @@
+/*frontend\src\styles\components\dashboard\KpiCard.module.css*/
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transition-property: box-shadow;
+  transition-duration: var(--tw-duration, var(--default-transition-duration));
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon {
+  width: 36px;
+  height: 36px;
+  background: var(--green);
+  border-radius: 8px;
+}
+
+.badge {
+  font-size: 12px;
+  color: var(--green);
+  background: #ecfdf5;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.title {
+  margin-top: 12px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.chart {
+  margin-top: 12px;
+  height: 50px;
+  background: linear-gradient(to top, var(--border-light), transparent);
+  border-radius: 6px;
+}
+
+.blue .icon {
+  background: var(--blue);
+}
+
+.blue .badge {
+  color: var(--blue);
+  background: rgba(92, 151, 246, 0.15);
+}
+
+.blue .chart {
+  background: linear-gradient(to top, rgba(92, 151, 246, 0.28), transparent);
+}
+
+.green .icon {
+  background: var(--green);
+}
+
+.green .badge {
+  color: var(--green);
+  background: rgba(36, 206, 149, 0.15);
+}
+
+.green .chart {
+  background: linear-gradient(to top, rgba(36, 206, 149, 0.28), transparent);
+}
+
+.purple .icon {
+  background: var(--purple);
+}
+
+.purple .badge {
+  color: var(--purple);
+  background: rgba(189, 123, 250, 0.16);
+}
+
+.purple .chart {
+  background: linear-gradient(to top, rgba(189, 123, 250, 0.3), transparent);
+}
+
+.orange .icon {
+  background: var(--orange);
+}
+
+.orange .badge {
+  color: var(--orange);
+  background: rgba(249, 115, 22, 0.16);
+}
+
+.orange .chart {
+  background: linear-gradient(to top, rgba(249, 115, 22, 0.28), transparent);
+}
