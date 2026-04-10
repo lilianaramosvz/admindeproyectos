@@ -19,8 +19,10 @@ function App() {
         <Route path="/backlog" element={<BacklogScreen />} />
         <Route path="/sprint" element={<SprintScreen />} />
         <Route path="/tasks" element={<TasksScreen />} />
+        <Route path="/tareas" element={<TasksScreen />} />
         <Route path="/kpis" element={<KPIScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
+        <Route path="/ajustes" element={<SettingsScreen />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>

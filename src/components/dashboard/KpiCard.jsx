@@ -1,14 +1,73 @@
 //frontend\src\components\dashboard\KpiCard.jsx
 import styles from "../../styles/components/dashboard/KpiCard.module.css";
 
-const kpis = [
-  { title: "Tareas completadas", value: "12/18", change: "+8%", color: "blue" },
-  { title: "En progreso", value: "5", change: "+2%", color: "green" },
-  { title: "Atrasadas", value: "2", change: "-1%", color: "purple" },
-  { title: "Velocidad del equipo", value: "87%", change: "+5%", color: "orange" },
+export const kpiCards = [
+  { title: "Tasa de errores", value: "3.8%", change: "-0.6%", color: "green" },
+  {
+    title: "Duración del sprint",
+    value: "14 días",
+    change: "Estable",
+    color: "blue",
+  },
+  {
+    title: "Tareas incompletas por sprint",
+    value: "4",
+    change: "-1",
+    color: "purple",
+  },
+  {
+    title: "Cumplimiento de sprint",
+    value: "91%",
+    change: "+4%",
+    color: "orange",
+  },
+  {
+    title: "Tiempo de bloqueo por dependencias",
+    value: "6.2h",
+    change: "-10%",
+    color: "yellow",
+    showChart: false,
+  },
+  {
+    title: "Tiempo de ciclo por tarea",
+    value: "2.7 días",
+    change: "-8%",
+    color: "darkblue",
+    showChart: false,
+  },
+  {
+    title: "Cumplimiento de fechas límite",
+    value: "88%",
+    change: "+3%",
+    color: "pink",
+    showChart: false,
+  },
+  {
+    title: "Precisión de estimación de carga",
+    value: "84%",
+    change: "+5%",
+    color: "aqua",
+    showChart: false,
+  },
 ];
 
-function KpiCardItem({ title, value, change, color }) {
+export const primaryKpiCards = kpiCards.slice(0, 4);
+
+export const relevantChartKpis = [
+  kpiCards[0],
+  kpiCards[3],
+  kpiCards[5],
+  kpiCards[7],
+];
+
+export default function KpiCard({
+  title,
+  value,
+  change,
+  color = "blue",
+  subtitle,
+  showChart = true,
+}) {
   const colorClass = styles[color] || "";
 
   return (
@@ -21,17 +80,9 @@ function KpiCardItem({ title, value, change, color }) {
       <h2 className={styles.title}>{value}</h2>
       <p className={styles.subtitle}>{title}</p>
 
-      <div className={styles.chart}></div>
-    </div>
-  );
-}
+      {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
 
-export default function KpiCard() {
-  return (
-    <section className={styles.grid} aria-label="KPI overview">
-      {kpis.map((kpi) => (
-        <KpiCardItem key={kpi.title} {...kpi} />
-      ))}
-    </section>
+      {showChart ? <div className={styles.chart}></div> : null}
+    </div>
   );
 }

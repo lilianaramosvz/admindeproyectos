@@ -10,6 +10,9 @@ export default function SprintBoard() {
           <strong className={styles.columnTitle}>Por hacer</strong>
           <div className={styles.task}>Definir objetivos de sprint</div>
           <div className={styles.task}>Revisar elementos del backlog</div>
+          <div className={styles.task}>Revisar elementos del backlog</div>
+          <div className={styles.task}>Revisar elementos del backlog</div>
+          <div className={styles.task}>Revisar elementos del backlog</div>
         </div>
         <div className={styles.column}>
           <strong className={styles.columnTitle}>En Progreso</strong>
