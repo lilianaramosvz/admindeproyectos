@@ -19,6 +19,21 @@
   --green: #54d6aa;
   --purple: #cb95fd;
   --orange: #f7a163;
+  --yellow: #f0b100;
+  --darkblue: #4b4571;
+  --pink: #f472b6;
+  --aqua: #00bba7;
+
+  /* semantic/tint tokens */
+  --chart-placeholder: #e5e7eb;
+  --blue-chart-soft: rgba(92, 151, 246, 0.28);
+  --green-chart-soft: rgba(36, 206, 149, 0.28);
+  --purple-chart-soft: rgba(189, 123, 250, 0.3);
+  --orange-chart-soft: rgba(249, 115, 22, 0.28);
+  --yellow-chart-soft: rgba(250, 204, 21, 0.35);
+  --darkblue-chart-soft: rgba(75, 69, 113, 0.35);
+  --pink-chart-soft: rgba(244, 114, 182, 0.35);
+  --aqua-chart-soft: rgba(0, 187, 167, 0.38);
 }
 
 body {

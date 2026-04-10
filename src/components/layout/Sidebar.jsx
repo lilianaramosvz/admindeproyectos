@@ -6,9 +6,9 @@ const navItems = [
   { label: "Dashboard", to: "/dashboard" },
   { label: "Backlog", to: "/backlog" },
   { label: "Sprint", to: "/sprint" },
-  { label: "Tareas", to: "/tasks" },
+  { label: "Tareas", to: "/tareas" },
   { label: "KPI's", to: "/kpis" },
-  { label: "Ajustes", to: "/settings" },
+  { label: "Ajustes", to: "/ajustes" },
 ];
 
 export default function Sidebar() {
@@ -42,6 +42,7 @@ export default function Sidebar() {
         <div className={styles.profileRow}>
           <div className={styles.avatar}></div>
           <div className={styles.userInfo}>
+            {/* Ejemplo para el display, esto se deberá cambiar a los valores reales del usuario */}
             <span className={styles.name}>Lili Ramos</span>
             <span className={styles.email}>lili.ramos@example.com</span>
           </div>
