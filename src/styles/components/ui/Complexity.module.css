@@ -1,0 +1,15 @@
+.complexity {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e0e1e4;
+}
+
+.dotActive {
+  background: #3b82f6;
+}

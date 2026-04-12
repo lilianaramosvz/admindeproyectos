@@ -103,28 +103,7 @@
 
 
 
-.badge {
-  font-size: 11px;
-  padding: 3px 8px;
-  color: var(--text-secondary);
-  border-radius: 999px;
-  font-weight: bold;
-}
 
-.high {
-  background: #ffe4e6;
-  color: #dc2626;
-}
-
-.medium {
-  background: #e0ecff;
-  color: #2563eb;
-}
-
-.low {
-  background: #e7f7ee;
-  color: #16a34a;
-}
 
 .assignee {
   display: flex;
@@ -132,18 +111,6 @@
   gap: 8px;
 }
 
-.avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(to bottom, #ec4ef8, #724ad0, #3b82f6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-quaternary);
-}
 .complexity {
   display: flex;
   gap: 4px;

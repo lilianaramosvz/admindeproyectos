@@ -1,4 +1,7 @@
 import styles from "../../styles/screens/BacklogTable.module.css";
+import Avatar from "../ui/Avatar";
+import Complexity from "../ui/Complexity";
+import Badge from "../ui/Badge";
 import { Search } from "lucide-react";
 
 
@@ -68,24 +71,17 @@ export default function BacklogPanel() {
             </div>
 
             <div>
-              <span className={`${styles.badge} ${styles[task.priority]}`}>
-                {task.priority}
-              </span>
+              <Badge type={task.priority}>
+                  {task.priority}
+              </Badge>
             </div>
 
-            <div className={styles.complexity}>
-             {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className={`${styles.dot} ${i < task.complexity ? styles.dotActive : ""}`}
-                />
-              ))}
-            </div>
+            <Complexity level={task.complexity} />
 
             <div>{task.hours}</div>
 
             <div className={styles.assignee}>
-              <div className={styles.avatar}>{task.assignee}</div>
+              <Avatar initials={task.assignee} />
               {task.name}
             </div>
 
