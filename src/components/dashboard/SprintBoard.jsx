@@ -1,9 +1,9 @@
 //frontend\src\components\dashboard\SprintBoard.jsx
-import styles from "../../styles/components/dashboard/SprintBoard.module.css";
+import styles from "../../styles/screens/SprintTable.module.css";
 
 export default function SprintBoard() {
   return (
-    <section className={styles.wrapper} aria-label="Sprint board">
+    <section className={styles.wrapper2} aria-label="Sprint board">
       <h2 className={styles.title}>Tablero de Sprint</h2>
       <div className={styles.board}>
         <div className={styles.column}>
