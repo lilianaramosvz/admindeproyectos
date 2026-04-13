@@ -2,7 +2,12 @@
 import styles from "../../styles/components/dashboard/KpiCard.module.css";
 
 export const kpiCards = [
-  { title: "Tasa de errores", value: "3.8%", change: "-0.6%", color: "green" },
+  {
+    title: "Tiempo de ciclo por tarea",
+    value: "2.7 días",
+    change: "-8%",
+    color: "green",
+  },
   {
     title: "Duración del sprint",
     value: "14 días",
@@ -10,13 +15,13 @@ export const kpiCards = [
     color: "blue",
   },
   {
-    title: "Tareas incompletas por sprint",
-    value: "4",
-    change: "-1",
+    title: "Precisión de estimación de carga",
+    value: "84%",
+    change: "+5%",
     color: "purple",
   },
   {
-    title: "Cumplimiento de sprint",
+    title: "Cumplimiento de ssssssssprint",
     value: "91%",
     change: "+4%",
     color: "orange",
@@ -29,24 +34,24 @@ export const kpiCards = [
     showChart: false,
   },
   {
-    title: "Tiempo de ciclo por tarea",
-    value: "2.7 días",
-    change: "-8%",
-    color: "darkblue",
+    title: "Tasa de errores",
+    value: "3.8%",
+    change: "-0.6%",
+    color: "yellow",
     showChart: false,
   },
   {
     title: "Cumplimiento de fechas límite",
     value: "88%",
     change: "+3%",
-    color: "pink",
+    color: "yellow",
     showChart: false,
   },
   {
-    title: "Precisión de estimación de carga",
-    value: "84%",
-    change: "+5%",
-    color: "aqua",
+    title: "Tareas incompletas por sprint",
+    value: "4",
+    change: "-1",
+    color: "yellow",
     showChart: false,
   },
 ];
@@ -55,9 +60,9 @@ export const primaryKpiCards = kpiCards.slice(0, 4);
 
 export const relevantChartKpis = [
   kpiCards[0],
+  kpiCards[1],
+  kpiCards[2],
   kpiCards[3],
-  kpiCards[5],
-  kpiCards[7],
 ];
 
 export default function KpiCard({
