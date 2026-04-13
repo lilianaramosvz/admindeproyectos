@@ -13,9 +13,9 @@ export default function KPIScreen() {
       <div className={styles.container}>
         {/* header */}
         <div className={styles.header}>
-          <h1>Key Performance Indicators</h1>
+          <h1>Indicadores Clave de Desempeño</h1>
           <p style={{ paddingTop: "12px" }}>
-            Aquí puedes ver los KPIs clave de tu equipo para evaluar su
+            Aquí puedes ver los KPI's clave de tu equipo para evaluar su
             desempeño y progreso.
           </p>
         </div>
