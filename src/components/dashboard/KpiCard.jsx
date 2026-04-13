@@ -21,7 +21,7 @@ export const kpiCards = [
     color: "purple",
   },
   {
-    title: "Cumplimiento de ssssssssprint",
+    title: "Cumplimiento de sprint",
     value: "91%",
     change: "+4%",
     color: "orange",

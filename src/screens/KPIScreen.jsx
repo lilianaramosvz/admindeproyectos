@@ -11,7 +11,6 @@ export default function KPIScreen() {
   return (
     <MainLayout title="KPIs">
       <div className={styles.container}>
-        {/* header */}
         <div className={styles.header}>
           <h1>Indicadores Clave de Desempeño</h1>
           <p style={{ paddingTop: "12px" }}>

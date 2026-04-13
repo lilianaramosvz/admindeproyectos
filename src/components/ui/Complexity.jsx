@@ -1,3 +1,4 @@
+//frontend\src\components\ui\Complexity.jsx
 import styles from "../../styles/components/ui/Complexity.module.css";
 
 export default function Complexity({ level, max = 5 }) {
