@@ -4,10 +4,21 @@ import KpiCard, {
   kpiCards,
   relevantChartKpis,
 } from "../components/dashboard/KpiCard";
+import { useKpis } from "../features/hooks/useKpis";
 
 import styles from "../styles/screens/KPIScreen.module.css";
 
 export default function KPIScreen() {
+  const userId = Number(import.meta.env.VITE_KPI_USER_ID || 1);
+  const projectId = Number(import.meta.env.VITE_KPI_PROJECT_ID || 1);
+  const { kpis, loading, error } = useKpis({ userId, projectId });
+
+  if (loading) {
+    return <div className={styles.container}>Cargando KPIs...</div>;
+  }
+
+  const secondaryKpis = kpiCards.slice(4, 8);
+
   return (
     <MainLayout title="KPIs">
       <div className={styles.container}>
@@ -21,7 +32,14 @@ export default function KPIScreen() {
 
         {/* MAIN KPIs */}
         <div className={styles.kpiGrid}>
-          {kpiCards.map((kpi) => (
+          {kpis.map((kpi) => (
+            <KpiCard key={kpi.title} {...kpi} />
+          ))}
+        </div>
+
+        {/* SECONDARY KPIs */}
+        <div className={styles.kpiGrid}>
+          {secondaryKpis.map((kpi) => (
             <KpiCard key={kpi.title} {...kpi} />
           ))}
         </div>

@@ -1,11 +1,24 @@
 //frontend\src\screens\Dashboard.jsx
 import MainLayout from "../components/layout/MainLayout";
-import KpiCard, { primaryKpiCards } from "../components/dashboard/KpiCard";
+import KpiCard from "../components/dashboard/KpiCard";
+import { useKpis } from "../features/hooks/useKpis";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
 import styles from "../styles/screens/Dashboard.module.css";
 
 export default function Dashboard() {
+  const userId = Number(import.meta.env.VITE_KPI_USER_ID || 1);
+  const projectId = Number(import.meta.env.VITE_KPI_PROJECT_ID || 1);
+  const { kpis, loading } = useKpis({ userId, projectId });
+
+  if (loading) {
+    return (
+      <MainLayout title="Dashboard">
+        <div className={styles.container}>Cargando KPIs...</div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout title="Dashboard">
       {/*Header*/}
@@ -19,7 +32,7 @@ export default function Dashboard() {
 
         {/*KPIS*/}
         <div className={styles.kpiGrid}>
-          {primaryKpiCards.map((kpi) => (
+          {kpis.map((kpi) => (
             <KpiCard key={kpi.title} {...kpi} />
           ))}
         </div>

@@ -58,6 +58,8 @@ export const kpiCards = [
 
 export const primaryKpiCards = kpiCards.slice(0, 4);
 
+export const secondaryKpiCards = kpiCards.slice(4, 8);
+
 export const relevantChartKpis = [
   kpiCards[0],
   kpiCards[1],
