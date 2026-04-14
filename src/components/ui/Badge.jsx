@@ -11,9 +11,15 @@ export default function Badge({ type, children }) {
     low: "low",
   }[(type || "").toLowerCase()] || "low";
 
+  const label = {
+    high: "alta",
+    medium: "media",
+    low: "baja",
+  }[normalizedType];
+
   return (
     <span className={`${styles.badge} ${styles[normalizedType]}`}>
-      {children}
+      {label || children}
     </span>
   );
 }
