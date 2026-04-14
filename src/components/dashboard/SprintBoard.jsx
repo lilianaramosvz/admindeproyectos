@@ -58,7 +58,7 @@ export const sprintTasks = [
         {
           id: "TSK-003",
           title: "Desarrollo de Tasks",
-          priority: "high",
+          priority: "low",
           date: "Mar 13",
           hours: "4h",
           assignee: "AR",

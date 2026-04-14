@@ -101,10 +101,6 @@
   color: var(--text-secondary);
 }
 
-
-
-
-
 .assignee {
   display: flex;
   align-items: center;
@@ -126,4 +122,11 @@
 .dotActive {
   background: #3b82f6;
 
+}
+
+.noResults {
+  grid-column: 1 / -1;
+  padding: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
 }

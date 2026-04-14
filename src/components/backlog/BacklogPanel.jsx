@@ -1,4 +1,5 @@
 //frontend\src\components\backlog\BacklogPanel.jsx
+import { useMemo, useState } from "react";
 import styles from "../../styles/screens/BacklogTable.module.css";
 import Avatar from "../ui/Avatar";
 import Complexity from "../ui/Complexity";
@@ -6,6 +7,8 @@ import Badge from "../ui/Badge";
 import { Search } from "lucide-react";
 
 export default function BacklogPanel() {
+  const [searchTerm, setSearchTerm] = useState("");
+
   const tasks = [
   {
     id: "TSK-001",
@@ -39,12 +42,32 @@ export default function BacklogPanel() {
   },
 ];
 
+  const filteredTasks = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+
+    if (!term) {
+      return tasks;
+    }
+
+    return tasks.filter((task) => {
+      const searchableValues = [task.title, task.id, task.name, task.sprint];
+      return searchableValues.some((value) =>
+        value.toLowerCase().includes(term)
+      );
+    });
+  }, [searchTerm, tasks]);
+
   return (
     <div>
       <section className={styles.wrapperSearch}>
         <div className={styles.searchBar}>
           <Search className={styles.icon} />
-          <input placeholder="Buscar tareas..." />
+          <input
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Buscar tareas..."
+            aria-label="Buscar tareas"
+          />
         </div>
       </section>
 
@@ -60,7 +83,7 @@ export default function BacklogPanel() {
             <div>SPRINT</div>
           </div>
 
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <div key={task.id} className={styles.row}>
               <div>
                 <strong>{task.title}</strong>
@@ -83,6 +106,10 @@ export default function BacklogPanel() {
               <div>{task.sprint}</div>
             </div>
           ))}
+
+          {filteredTasks.length === 0 && (
+            <div className={styles.noResults}>No se encontraron tareas.</div>
+          )}
         </div>
       </section>
     </div>
