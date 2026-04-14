@@ -32,9 +32,9 @@ export default function SettingsScreen() {
   };
 
   const fields = [
-    { key: "email", label: "Correo" },
-    { key: "role", label: "Rol" },
-    { key: "team", label: "Equipo" },
+    { key: "email", label: "Correo", editable: false },
+    { key: "role", label: "Rol", editable: true },
+    { key: "team", label: "Equipo", editable: true },
   ];
 
   return (
@@ -64,6 +64,7 @@ export default function SettingsScreen() {
                   <button
                     className={styles.edit}
                     onClick={() => handleEdit(field.key)}
+                    style={{ visibility: field.editable ? "visible" : "hidden" }}
                   >
                     Editar
                   </button>

@@ -12,7 +12,6 @@ const toPercent = (value) => {
   if (Number.isFinite(num)) {
     return `${num.toFixed(1)}%`;
   }
-  // Si el valor es null/undefined, mostrar Sin datos en lugar de N/A
   return "0%";
 };
 
