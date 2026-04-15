@@ -7,12 +7,12 @@
   width: 98%;
   margin-left: 1%;
   padding: 10px 14px;
-  padding-left: 40px; 
+  padding-left: 40px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   background: var(--bg-primary);
   outline: none;
-  font-size: 14px; 
+  font-size: 14px;
 }
 
 .searchBar input:focus {
@@ -29,7 +29,6 @@
   color: var(--text-tertiary);
   width: 14px;
 }
-
 
 .wrapperSearch {
   background: var(--bg-primary);
@@ -72,7 +71,7 @@
   grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr 1fr;
   align-items: center;
   background: var(--bg-tertiary);
-  border:none;
+  border: none;
 }
 
 .row {
@@ -85,10 +84,11 @@
   grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr 1fr;
   align-items: center;
   min-height: 48px;
-  transition: background 0.2s ease, transform 0.1s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.1s ease;
   color: var(--text-primary);
   font-size: 14px;
-
 }
 
 .row:hover {
@@ -121,7 +121,6 @@
 
 .dotActive {
   background: #3b82f6;
-
 }
 
 .noResults {

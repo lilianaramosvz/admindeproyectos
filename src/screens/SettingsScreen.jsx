@@ -64,7 +64,9 @@ export default function SettingsScreen() {
                   <button
                     className={styles.edit}
                     onClick={() => handleEdit(field.key)}
-                    style={{ visibility: field.editable ? "visible" : "hidden" }}
+                    style={{
+                      visibility: field.editable ? "visible" : "hidden",
+                    }}
                   >
                     Editar
                   </button>
