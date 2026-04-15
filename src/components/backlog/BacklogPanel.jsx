@@ -10,37 +10,37 @@ export default function BacklogPanel() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const tasks = [
-  {
-    id: "TSK-001",
-    title: "Desarrollo de Dashboard",
-    priority: "high",
-    complexity: 4,
-    hours: "4h",
-    assignee: "LR",
-    name: "Liliana Ramos",
-    sprint: "Sprint 11",
-  },
-  {
-    id: "TSK-002",
-    title: "Desarrollo de Backlog",
-    priority: "medium",
-    complexity: 3,
-    hours: "3h",
-    assignee: "AR",
-    name: "Anna Ramirez",
-    sprint: "Sprint 1",
-  },
-  {
-    id: "TSK-003",
-    title: "Desarrollo de KPIs",
-    priority: "medium",
-    complexity: 3,
-    hours: "2h",
-    assignee: "LR",
-    name: "Liliana Ramos",
-    sprint: "Sprint 1",
-  },
-];
+    {
+      id: "TSK-001",
+      title: "Desarrollo de Dashboard",
+      priority: "high",
+      complexity: 4,
+      hours: "4h",
+      assignee: "LR",
+      name: "Liliana Ramos",
+      sprint: "Sprint 11",
+    },
+    {
+      id: "TSK-002",
+      title: "Desarrollo de Backlog",
+      priority: "medium",
+      complexity: 3,
+      hours: "3h",
+      assignee: "AR",
+      name: "Anna Ramirez",
+      sprint: "Sprint 1",
+    },
+    {
+      id: "TSK-003",
+      title: "Desarrollo de KPIs",
+      priority: "medium",
+      complexity: 3,
+      hours: "2h",
+      assignee: "LR",
+      name: "Liliana Ramos",
+      sprint: "Sprint 1",
+    },
+  ];
 
   const filteredTasks = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
@@ -52,7 +52,7 @@ export default function BacklogPanel() {
     return tasks.filter((task) => {
       const searchableValues = [task.title, task.id, task.name, task.sprint];
       return searchableValues.some((value) =>
-        value.toLowerCase().includes(term)
+        value.toLowerCase().includes(term),
       );
     });
   }, [searchTerm, tasks]);
