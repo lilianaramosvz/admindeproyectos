@@ -10,6 +10,59 @@ import {
 
 const KPI_DEFINITIONS = [
   {
+    key: "precision",
+    title: "Precisión de estimación de carga",
+    historyType: "PRECISION_ESTIMACION",
+    color: "purple",
+    scope: "user",
+    unit: "%",
+    aliases: [
+      "precision-estimacion",
+      "precisionestimacion",
+      "precision-estimacion-carga",
+      "precisionestimaciondecarga",
+      "estimacion-de-carga",
+      "estimaciondecarga",
+      "precision",
+      "precision de estimacion",
+    ],
+    valueFields: [
+      "efficiencyPercentage",
+      "efficiencypercentage",
+      "precisionEstimacion",
+      "precision",
+      "porcentajeCarga",
+      "percentage",
+      "valor",
+      "value",
+      "average",
+      "promedio",
+    ],
+    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
+    fetcher: getUserPrecisionEstimation,
+  },
+  {
+    key: "compliance",
+    title: "Cumplimiento de tareas",
+    historyType: "CUMPLIMIENTO_SPRINT",
+    color: "orange",
+    scope: "sprint",
+    unit: "%",
+    aliases: ["cumplimiento", "sprintcompliance", "compliance"],
+    valueFields: [
+      "productivityPercentage",
+      "compliancePercentage",
+      "cumplimiento",
+      "percentage",
+      "valor",
+      "value",
+      "average",
+      "promedio",
+    ],
+    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
+    fetcher: getSprintCompliance,
+  },
+  {
     key: "cycleTime",
     title: "Tiempo de ciclo por tarea",
     historyType: "TIEMPO_CICLO",
@@ -49,59 +102,6 @@ const KPI_DEFINITIONS = [
     ],
     statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
     fetcher: getSprintDuration,
-  },
-  {
-    key: "precision",
-    title: "Precisión de estimación de carga",
-    historyType: "PRECISION_ESTIMACION",
-    color: "purple",
-    scope: "user",
-    unit: "%",
-    aliases: [
-      "precision-estimacion",
-      "precisionestimacion",
-      "precision-estimacion-carga",
-      "precisionestimaciondecarga",
-      "estimacion-de-carga",
-      "estimaciondecarga",
-      "precision",
-      "precision de estimacion",
-    ],
-    valueFields: [
-      "efficiencyPercentage",
-      "efficiencypercentage",
-      "precisionEstimacion",
-      "precision",
-      "porcentajeCarga",
-      "percentage",
-      "valor",
-      "value",
-      "average",
-      "promedio",
-    ],
-    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
-    fetcher: getUserPrecisionEstimation,
-  },
-  {
-    key: "compliance",
-    title: "Cumplimiento de sprint",
-    historyType: "CUMPLIMIENTO_SPRINT",
-    color: "orange",
-    scope: "sprint",
-    unit: "%",
-    aliases: ["cumplimiento", "sprintcompliance", "compliance"],
-    valueFields: [
-      "productivityPercentage",
-      "compliancePercentage",
-      "cumplimiento",
-      "percentage",
-      "valor",
-      "value",
-      "average",
-      "promedio",
-    ],
-    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
-    fetcher: getSprintCompliance,
   },
 ];
 
@@ -433,6 +433,70 @@ const getStatusBadgeText = (statusMessage) => {
   return firstWord || null;
 };
 
+const extractEstimationComparison = (snapshot) => {
+  if (!snapshot || typeof snapshot !== "object") {
+    return null;
+  }
+
+  const estimatedRaw = selectValueFromObject(snapshot, [
+    "estimatedHours",
+    "horasEstimadas",
+    "tiempoEstimado",
+    "estimatedTime",
+    "estimado",
+  ]);
+  const realRaw = selectValueFromObject(snapshot, [
+    "actualHours",
+    "realHours",
+    "horasReales",
+    "tiempoReal",
+    "actualTime",
+    "real",
+  ]);
+
+  const estimated = toNumber(estimatedRaw);
+  const real = toNumber(realRaw);
+
+  if (estimated !== null && real !== null) {
+    return {
+      estimated,
+      real,
+      unit: "hrs",
+    };
+  }
+
+  const details = extractTextFromObject(snapshot, [
+    "calculationDetails",
+    "calculoDetalles",
+    "details",
+    "detalle",
+  ]);
+
+  if (!details) {
+    return null;
+  }
+
+  const pairMatch = details.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (!pairMatch) {
+    return null;
+  }
+
+  const parsedEstimated = toNumber(pairMatch[1]);
+  const parsedReal = toNumber(pairMatch[2]);
+
+  if (parsedEstimated === null || parsedReal === null) {
+    return null;
+  }
+
+  const hasHoursUnit = /hr|hora/i.test(details);
+
+  return {
+    estimated: parsedEstimated,
+    real: parsedReal,
+    unit: hasHoursUnit ? "hrs" : "",
+  };
+};
+
 const getCurrentValue = (snapshot, chartData, metric) => {
   if (snapshot && typeof snapshot === "object") {
     const directValue = selectValueFromObject(snapshot, metric.valueFields);
@@ -528,6 +592,10 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
           const fullStatusMessage = statusMessage || statusMessageFallback;
           const statusBadgeText = getStatusBadgeText(fullStatusMessage);
           const trendMessage = getTrendFromSeries(chartData, metric);
+          const estimationComparison =
+            metric.key === "precision"
+              ? extractEstimationComparison(snapshot)
+              : null;
 
           return {
             key: metric.key,
@@ -539,6 +607,7 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
             chartData,
             unit: metric.unit,
             hasHistory: chartMeta.hasHistory,
+            estimationComparison,
           };
         });
 

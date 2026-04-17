@@ -100,10 +100,10 @@ export default function MiniChart({
         <AreaChart
           data={chartData}
           margin={{
-            top: 8,
-            right: 12,
+            top: compact ? 4 : 8,
+            right: compact ? 8 : 12,
             left: compact ? 0 : 40,
-            bottom: compact ? 0 : 30,
+            bottom: compact ? 4 : 30,
           }}
         >
           <defs>
@@ -173,11 +173,11 @@ export default function MiniChart({
             type="monotone"
             dataKey="value"
             stroke={strokeColor}
-            strokeWidth={2.5}
+            strokeWidth={compact ? 2.8 : 2.5}
             fill={`url(#gradient-${color})`}
-            dot={{ r: 3.5, fill: strokeColor, strokeWidth: 0 }}
+            dot={{ r: compact ? 3 : 3.5, fill: strokeColor, strokeWidth: 0 }}
             activeDot={{
-              r: 5,
+              r: compact ? 4.5 : 5,
               fill: strokeColor,
               strokeWidth: 1,
               stroke: "var(--bg-primary)",
