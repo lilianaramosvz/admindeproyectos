@@ -44,6 +44,23 @@ function ChartTooltip({ active, payload, label, unit }) {
   );
 }
 
+function formatAxisTick(value, unit) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return "";
+  }
+
+  if (unit === "%") {
+    return `${numericValue.toFixed(0)}%`;
+  }
+
+  if (unit === "días") {
+    return `${numericValue.toFixed(1)} d`;
+  }
+
+  return numericValue.toFixed(1);
+}
+
 export default function MiniChart({
   data = [],
   color = "blue",
@@ -67,6 +84,15 @@ export default function MiniChart({
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const padding = (maxValue - minValue) * 0.1 || 10;
+  const xTickInterval =
+    compact || chartData.length <= 7 ? 0 : Math.ceil(chartData.length / 7);
+  const yAxisWidth = compact
+    ? 0
+    : unit === "%"
+      ? 56
+      : unit === "días"
+        ? 64
+        : 52;
 
   return (
     <div className={`${styles.root} ${compact ? styles.compact : styles.full}`}>
@@ -106,7 +132,9 @@ export default function MiniChart({
             tickLine={false}
             axisLine={false}
             tick={{ fill: "var(--text-tertiary)", fontSize: 11 }}
-            minTickGap={20}
+            minTickGap={28}
+            interval={xTickInterval}
+            tickMargin={10}
           />
           <YAxis
             hide={compact}
@@ -114,6 +142,9 @@ export default function MiniChart({
             tickLine={false}
             axisLine={false}
             tick={{ fill: "var(--text-tertiary)", fontSize: 11 }}
+            width={yAxisWidth}
+            tickMargin={8}
+            tickFormatter={(value) => formatAxisTick(value, unit)}
             width={compact ? 0 : 40}
             label={
               !compact && unit

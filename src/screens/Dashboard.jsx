@@ -34,7 +34,7 @@ export default function Dashboard() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Dashboard</h1>
-          <p style={{ paddingTop: "12px" }}>
+          <p className={styles.intro}>
             ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
           </p>
           <p className={styles.contextMeta}>

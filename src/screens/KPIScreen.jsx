@@ -1,9 +1,11 @@
 //frontend\src\screens\KPIScreen.jsx
 import MainLayout from "../components/layout/MainLayout";
-import KpiCard, { secondaryKpiCards } from "../components/dashboard/KpiCard";
+import KpiCard from "../components/dashboard/KpiCard";
 import MiniChart from "../components/dashboard/MiniChart";
 import { useKpis } from "../features/hooks/useKpis";
 import { useKpiContext } from "../features/hooks/useKpiContext";
+import { useTaskComplianceByUser } from "../features/hooks/useTaskComplianceByUser";
+import UserComplianceChart from "../components/dashboard/UserComplianceChart";
 
 import styles from "../styles/screens/KPIScreen.module.css";
 
@@ -19,19 +21,22 @@ export default function KPIScreen() {
     error: contextError,
   } = useKpiContext();
   const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
+  const {
+    data: complianceByUser,
+    loading: complianceLoading,
+    error: complianceError,
+  } = useTaskComplianceByUser(sprintId);
 
   if (contextLoading || loading) {
     return <div className={styles.container}>Cargando KPIs...</div>;
   }
-
-  const secondaryKpis = secondaryKpiCards;
 
   return (
     <MainLayout title="KPIs">
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Indicadores Clave de Desempeño</h1>
-          <p style={{ paddingTop: "12px" }}>
+          <p className={styles.intro}>
             Aquí puedes ver los KPI's clave de tu equipo para evaluar su
             desempeño y progreso.
           </p>
@@ -52,12 +57,12 @@ export default function KPIScreen() {
           ))}
         </div>
 
-        {/* SECONDARY KPIs */}
+        {/* SECONDARY KPIs 
         <div className={styles.kpiGrid}>
           {secondaryKpis.map((kpi) => (
             <KpiCard key={kpi.title} {...kpi} />
           ))}
-        </div>
+        </div>*/}
 
         {/* charts */}
         <div className={styles.charts}>
@@ -67,18 +72,35 @@ export default function KPIScreen() {
                 <div>
                   <h3>{kpi.title}</h3>
                   <p className={styles.chartMeta}>
-                    {kpi.hasHistory
-                      ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
-                      : "Sin historial: mostrando valor actual"}
+                    {kpi.key === "compliance"
+                      ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
+                      : kpi.hasHistory
+                        ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
+                        : "Sin historial: mostrando valor actual"}
                   </p>
                 </div>
                 <span className={styles.chartValue}>{kpi.value}</span>
               </div>
-              <MiniChart
-                data={kpi.chartData}
-                color={kpi.color}
-                unit={kpi.unit}
-              />
+              {kpi.key === "compliance" ? (
+                <>
+                  {complianceError ? (
+                    <div className={styles.error}>{complianceError}</div>
+                  ) : null}
+                  {complianceLoading ? (
+                    <div className={styles.chartMeta}>
+                      Cargando cumplimiento por usuario...
+                    </div>
+                  ) : (
+                    <UserComplianceChart data={complianceByUser} />
+                  )}
+                </>
+              ) : (
+                <MiniChart
+                  data={kpi.chartData}
+                  color={kpi.color}
+                  unit={kpi.unit}
+                />
+              )}
             </div>
           ))}
         </div>
