@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import styles from "../../styles/components/dashboard/PrecisionEstimationChart.module.css";
+import styles from "../../styles/components/dashboard/SprintDurationChart.module.css";
 
 function formatHours(value, unit) {
   const numericValue = Number(value);
@@ -17,7 +17,7 @@ function formatHours(value, unit) {
   return `${numericValue.toFixed(1)} ${unit}`.trim();
 }
 
-function EstimationTooltip({ active, payload, unit }) {
+function CycleTooltip({ active, payload, unit }) {
   if (!active || !payload || !payload.length) return null;
 
   const point = payload[0]?.payload;
@@ -46,23 +46,23 @@ function ValueLabel({ x, y, width, height, value, unit }) {
   );
 }
 
-export default function PrecisionEstimationChart({ comparison }) {
+export default function CycleTimeHistogramChart({ comparison }) {
   if (!comparison) {
-    return <div className={styles.emptyState}>Sin detalle de estimación</div>;
+    return <div className={styles.emptyState}>Sin detalle de tiempo de ciclo</div>;
   }
 
   const unit = comparison.unit || "hrs";
   const chartData = [
-    { key: "estimated", label: "Tiempo estimado", value: comparison.estimated },
-    { key: "real", label: "Tiempo real", value: comparison.real },
+    { key: "expected", label: "Tiempo esperado", value: comparison.expected },
+    { key: "actual", label: "Tiempo real", value: comparison.actual },
   ];
 
-  const delta = comparison.estimated - comparison.real;
-  const deltaText = `${delta >= 0 ? "+" : ""}${delta.toFixed(1)} ${unit}`.trim();
+  const delta = comparison.actual - comparison.expected;
+  const deltaText = `${delta > 0 ? "+" : ""}${delta.toFixed(1)} ${unit}`.trim();
   const deltaLabel =
-    delta >= 0
-      ? `Diferencia a favor de estimación: ${deltaText}`
-      : `Diferencia a favor de tiempo real: ${deltaText}`;
+    delta <= 0
+      ? `Promedio real dentro del objetivo: ${deltaText}`
+      : `Promedio real por encima del objetivo: ${deltaText}`;
 
   return (
     <div className={styles.root}>
@@ -94,15 +94,15 @@ export default function PrecisionEstimationChart({ comparison }) {
             width={48}
           />
           <Tooltip
-            content={(props) => <EstimationTooltip {...props} unit={unit} />}
-            cursor={{ fill: "rgba(108, 162, 248, 0.08)" }}
+            content={(props) => <CycleTooltip {...props} unit={unit} />}
+            cursor={{ fill: "rgba(84, 214, 170, 0.10)" }}
             wrapperStyle={{ outline: "none" }}
           />
           <Bar dataKey="value" radius={[8, 8, 0, 0]} maxBarSize={54}>
             {chartData.map((entry) => (
               <Cell
                 key={entry.key}
-                fill={entry.key === "estimated" ? "var(--purple)" : "var(--blue)"}
+                fill={entry.key === "expected" ? "var(--green)" : "var(--darkblue)"}
               />
             ))}
             <LabelList

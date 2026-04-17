@@ -68,7 +68,7 @@ const KPI_DEFINITIONS = [
     historyType: "TIEMPO_CICLO",
     color: "green",
     scope: "project",
-    unit: "días",
+    unit: "%",
     aliases: ["tiempo-ciclo", "tiempociclo", "cycletime", "tiempo de ciclo"],
     valueFields: [
       "productivityPercentage",
@@ -559,6 +559,70 @@ const extractDurationComparison = (snapshot) => {
   };
 };
 
+const extractCycleTimeComparison = (snapshot) => {
+  if (!snapshot || typeof snapshot !== "object") {
+    return null;
+  }
+
+  const actualRaw = selectValueFromObject(snapshot, [
+    "actualValue",
+    "actualHours",
+    "realHours",
+    "horasReales",
+    "tiempoReal",
+    "real",
+  ]);
+  const expectedRaw = selectValueFromObject(snapshot, [
+    "expectedValue",
+    "expectedHours",
+    "estimatedHours",
+    "horasEsperadas",
+    "tiempoEsperado",
+    "estimado",
+    "planificado",
+  ]);
+
+  const actual = toNumber(actualRaw);
+  const expected = toNumber(expectedRaw);
+
+  if (actual !== null && expected !== null && expected > 0) {
+    return {
+      actual,
+      expected,
+      unit: "hrs",
+    };
+  }
+
+  const details = extractTextFromObject(snapshot, [
+    "calculationDetails",
+    "calculoDetalles",
+    "details",
+    "detalle",
+  ]);
+
+  if (!details) {
+    return null;
+  }
+
+  // Backend format: "8.6 / 8.7 hrs" => actual / expected
+  const pairMatch = details.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (!pairMatch) {
+    return null;
+  }
+
+  const parsedActual = toNumber(pairMatch[1]);
+  const parsedExpected = toNumber(pairMatch[2]);
+  if (parsedActual === null || parsedExpected === null || parsedExpected <= 0) {
+    return null;
+  }
+
+  return {
+    actual: parsedActual,
+    expected: parsedExpected,
+    unit: /hr|hora/i.test(details) ? "hrs" : "",
+  };
+};
+
 const getCurrentValue = (snapshot, chartData, metric) => {
   if (snapshot && typeof snapshot === "object") {
     const directValue = selectValueFromObject(snapshot, metric.valueFields);
@@ -662,6 +726,10 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
             metric.key === "duration"
               ? extractDurationComparison(snapshot)
               : null;
+          const cycleTimeComparison =
+            metric.key === "cycleTime"
+              ? extractCycleTimeComparison(snapshot)
+              : null;
 
           const durationChartData = durationComparison
             ? [
@@ -682,6 +750,21 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
             ? (durationComparison.real / durationComparison.planned) * 100
             : null;
 
+          const cycleTimeChartData = cycleTimeComparison
+            ? [
+                {
+                  value: cycleTimeComparison.expected,
+                  label: "Tiempo esperado",
+                  date: null,
+                },
+                {
+                  value: cycleTimeComparison.actual,
+                  label: "Tiempo real",
+                  date: null,
+                },
+              ]
+            : null;
+
           const displayValue =
             metric.key === "duration" && durationComparison
               ? (() => {
@@ -696,6 +779,19 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
 
                   return `${durationPercent.toFixed(2)}%`;
                 })()
+              : metric.key === "cycleTime"
+                ? (() => {
+                    const cyclePercent = normalizeMetricValue(currentValue, {
+                      ...metric,
+                      unit: "%",
+                    });
+
+                    if (cyclePercent === null) {
+                      return "Sin datos";
+                    }
+
+                    return `${cyclePercent.toFixed(1)}%`;
+                  })()
               : formatMetricValue(currentValue, metric);
 
           const displaySubtitle =
@@ -703,12 +799,15 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
               ? undefined
               : undefined;
 
-          const displayChartData = durationChartData ?? chartData;
+          const displayChartData = durationChartData ?? cycleTimeChartData ?? chartData;
           const displayUnit =
             metric.key === "duration" && durationComparison
               ? durationComparison.unit
+              : metric.key === "cycleTime" && cycleTimeComparison
+                ? cycleTimeComparison.unit
               : metric.unit;
-          const displayHasHistory = durationChartData ? false : chartMeta.hasHistory;
+          const displayHasHistory =
+            durationChartData || cycleTimeChartData ? false : chartMeta.hasHistory;
 
           return {
             key: metric.key,
@@ -723,6 +822,7 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
             subtitle: displaySubtitle,
             estimationComparison,
             durationComparison,
+            cycleTimeComparison,
           };
         });
 

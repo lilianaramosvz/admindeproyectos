@@ -4,6 +4,7 @@ import KpiCard from "../components/dashboard/KpiCard";
 import MiniChart from "../components/dashboard/MiniChart";
 import PrecisionEstimationChart from "../components/dashboard/PrecisionEstimationChart";
 import SprintDurationChart from "../components/dashboard/SprintDurationChart";
+import CycleTimeHistogramChart from "../components/dashboard/CycleTimeHistogramChart";
 import { useKpis } from "../features/hooks/useKpis";
 import { useKpiContext } from "../features/hooks/useKpiContext";
 import { useTaskComplianceByUser } from "../features/hooks/useTaskComplianceByUser";
@@ -80,6 +81,8 @@ export default function KPIScreen() {
                         ? "Comparativo de tiempo estimado vs tiempo real del usuario activo"
                         : kpi.key === "duration"
                           ? "Comparativo de tiempo real del sprint vs tiempo planificado"
+                          : kpi.key === "cycleTime"
+                            ? "Histograma de tiempo real promedio vs tiempo esperado por tarea"
                       : kpi.hasHistory
                         ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
                         : "Sin historial: mostrando valor actual"}
@@ -104,6 +107,8 @@ export default function KPIScreen() {
                 <PrecisionEstimationChart comparison={kpi.estimationComparison} />
               ) : kpi.key === "duration" ? (
                 <SprintDurationChart comparison={kpi.durationComparison} />
+              ) : kpi.key === "cycleTime" ? (
+                <CycleTimeHistogramChart comparison={kpi.cycleTimeComparison} />
               ) : (
                 <MiniChart
                   data={kpi.chartData}
