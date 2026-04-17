@@ -33,6 +33,13 @@ const ASSIGNED_FIELDS = [
   "tareas",
 ];
 
+const DETAILS_FIELDS = [
+  "calculationDetails",
+  "calculoDetalles",
+  "details",
+  "detalle",
+];
+
 const unwrapResponse = (response) => {
   if (response && typeof response === "object") {
     return response.data ?? response.result ?? response.payload ?? response;
@@ -85,11 +92,45 @@ const extractTaskCounts = (response) => {
   if (!source || typeof source !== "object")
     return { completed: null, assigned: null };
 
+  const parseCountsFromDetails = (detailsText) => {
+    const text = String(detailsText ?? "");
+    if (!text) return { completed: null, assigned: null };
+
+    // Examples: "9 / 9 tareas", "8/10 tasks"
+    const slashMatch = text.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+    if (slashMatch) {
+      const completedValue = toNumber(slashMatch[1]);
+      const assignedValue = toNumber(slashMatch[2]);
+
+      if (
+        completedValue !== null &&
+        assignedValue !== null &&
+        assignedValue >= completedValue
+      ) {
+        return {
+          completed: Math.round(completedValue),
+          assigned: Math.round(assignedValue),
+        };
+      }
+    }
+
+    return { completed: null, assigned: null };
+  };
+
   const rawCompleted = extractField(source, COMPLETED_FIELDS);
   const rawAssigned = extractField(source, ASSIGNED_FIELDS);
+  const rawDetails = extractField(source, DETAILS_FIELDS);
 
   const completed = toNumber(rawCompleted);
   const assigned = toNumber(rawAssigned);
+  const parsedFromDetails = parseCountsFromDetails(rawDetails);
+
+  if (
+    parsedFromDetails.completed !== null &&
+    parsedFromDetails.assigned !== null
+  ) {
+    return parsedFromDetails;
+  }
 
   // If both are present and consistent, return them
   if (completed !== null && assigned !== null && assigned >= completed) {
