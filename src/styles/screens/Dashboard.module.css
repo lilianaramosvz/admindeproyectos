@@ -16,6 +16,10 @@
   font-size: 14px;
 }
 
+.intro {
+  padding-top: 12px;
+}
+
 .contextMeta {
   color: var(--text-tertiary);
   font-size: 12px;

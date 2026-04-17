@@ -6,6 +6,9 @@
   --bg-tertiary: #f8f8f8;
   --shadow-md:
     rgba(0, 0, 0, 0.128) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  --shadow-lg:
+    rgba(15, 23, 42, 0.12) 0px 10px 28px -12px,
+    rgba(15, 23, 42, 0.08) 0px 4px 10px -6px;
 
   /* borders */
   --border-light: #dcdfe5;
@@ -28,6 +31,10 @@
 
   /* semantic/tint tokens */
   --chart-placeholder: #e5e7eb;
+  --chart-card-hover: rgba(17, 24, 39, 0.08);
+  --chart-tooltip-border: rgba(108, 162, 248, 0.45);
+  --chart-tooltip-border-orange: rgba(247, 161, 99, 0.45);
+  --chart-cursor-orange: rgba(241, 142, 37, 0.08);
   --blue-chart-soft: rgba(92, 151, 246, 0.28);
   --green-chart-soft: rgba(36, 206, 149, 0.28);
   --purple-chart-soft: rgba(189, 123, 250, 0.3);

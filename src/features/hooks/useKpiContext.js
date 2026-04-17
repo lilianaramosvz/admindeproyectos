@@ -1,3 +1,4 @@
+//frontend\src\features\hooks\useKpiContext.js
 import { useEffect, useState } from "react";
 import {
   getActiveProjects,
@@ -41,7 +42,9 @@ export function useKpiContext() {
         }
 
         const selectedUserId =
-          toNumberOrNull(import.meta.env.VITE_KPI_USER_ID) ?? users?.[0]?.id ?? null;
+          toNumberOrNull(import.meta.env.VITE_KPI_USER_ID) ??
+          users?.[0]?.id ??
+          null;
         const selectedProjectId =
           toNumberOrNull(import.meta.env.VITE_KPI_PROJECT_ID) ??
           projects?.[0]?.id ??
@@ -52,8 +55,12 @@ export function useKpiContext() {
           selectedProjectId;
 
         const selectedUser = users?.find((item) => item.id === selectedUserId);
-        const selectedProject = projects?.find((item) => item.id === selectedProjectId);
-        const selectedSprint = sprints?.find((item) => item.id === selectedSprintId);
+        const selectedProject = projects?.find(
+          (item) => item.id === selectedProjectId,
+        );
+        const selectedSprint = sprints?.find(
+          (item) => item.id === selectedSprintId,
+        );
 
         setContext({
           userId: selectedUserId,
