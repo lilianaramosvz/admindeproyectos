@@ -27,9 +27,10 @@ function ChartTooltip({ active, payload, label, unit }) {
   }
 
   const value = payload[0].value;
-  const formattedValue = typeof value === 'number' ? value.toFixed(2) : value;
+  const formattedValue = typeof value === "number" ? value.toFixed(2) : value;
   const count = payload[0].payload?.count;
-  const countLabel = count && count > 1 ? ` (promedio de ${count} valores)` : '';
+  const countLabel =
+    count && count > 1 ? ` (promedio de ${count} valores)` : "";
 
   return (
     <div className={styles.tooltip}>
@@ -60,7 +61,9 @@ export default function MiniChart({
   }
 
   // Calcular dominio dinámico para el eje Y con padding
-  const values = chartData.map(p => p.value).filter(v => typeof v === 'number');
+  const values = chartData
+    .map((p) => p.value)
+    .filter((v) => typeof v === "number");
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
   const padding = (maxValue - minValue) * 0.1 || 10;
@@ -70,7 +73,12 @@ export default function MiniChart({
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={chartData}
-          margin={{ top: 8, right: 12, left: compact ? 0 : 40, bottom: compact ? 0 : 20 }}
+          margin={{
+            top: 8,
+            right: 12,
+            left: compact ? 0 : 40,
+            bottom: compact ? 0 : 20,
+          }}
         >
           <defs>
             <linearGradient
@@ -107,17 +115,28 @@ export default function MiniChart({
             axisLine={false}
             tick={{ fill: "var(--text-tertiary)", fontSize: 11 }}
             width={compact ? 0 : 40}
-            label={!compact && unit ? { value: unit, angle: -90, position: 'insideLeft', offset: 10, fill: "var(--text-tertiary)", fontSize: 11 } : undefined}
+            label={
+              !compact && unit
+                ? {
+                    value: unit,
+                    angle: -90,
+                    position: "insideLeft",
+                    offset: 10,
+                    fill: "var(--text-tertiary)",
+                    fontSize: 11,
+                  }
+                : undefined
+            }
           />
           <Tooltip
             content={(props) => <ChartTooltip {...props} unit={unit} />}
-            cursor={{ 
-              stroke: strokeColor, 
+            cursor={{
+              stroke: strokeColor,
               strokeOpacity: 0.25,
               fill: strokeColor,
-              fillOpacity: 0.08
+              fillOpacity: 0.08,
             }}
-            wrapperStyle={{ outline: 'none' }}
+            wrapperStyle={{ outline: "none" }}
           />
           <Area
             type="monotone"
@@ -126,7 +145,12 @@ export default function MiniChart({
             strokeWidth={2.5}
             fill={`url(#gradient-${color})`}
             dot={{ r: 3.5, fill: strokeColor, strokeWidth: 0 }}
-            activeDot={{ r: 5, fill: strokeColor, strokeWidth: 1, stroke: 'var(--bg-primary)' }}
+            activeDot={{
+              r: 5,
+              fill: strokeColor,
+              strokeWidth: 1,
+              stroke: "var(--bg-primary)",
+            }}
           />
         </AreaChart>
       </ResponsiveContainer>
