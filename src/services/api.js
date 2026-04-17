@@ -42,7 +42,9 @@ export function getSprintDuration(userId, sprintId) {
 }
 
 export function getProjectCycleTime(userId, projectId) {
-  return getJson(`/api/kpis/usuario/${userId}/proyecto/${projectId}/tiempo-ciclo`);
+  return getJson(
+    `/api/kpis/usuario/${userId}/proyecto/${projectId}/tiempo-ciclo`,
+  );
 }
 
 export function getUserKPIHistory(userId, sprintId, tipoKPI) {

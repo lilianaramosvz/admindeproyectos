@@ -85,7 +85,8 @@
 
 .chart {
   margin-top: 12px;
-  height: 68px;
+  height: 84px;
+  padding: 6px 8px 4px;
   border-radius: 10px;
   background: linear-gradient(to top, rgba(220, 223, 229, 0.22), transparent);
   overflow: hidden;

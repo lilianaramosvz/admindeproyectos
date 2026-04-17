@@ -2,6 +2,7 @@
 import MainLayout from "../components/layout/MainLayout";
 import KpiCard from "../components/dashboard/KpiCard";
 import MiniChart from "../components/dashboard/MiniChart";
+import PrecisionEstimationChart from "../components/dashboard/PrecisionEstimationChart";
 import { useKpis } from "../features/hooks/useKpis";
 import { useKpiContext } from "../features/hooks/useKpiContext";
 import { useTaskComplianceByUser } from "../features/hooks/useTaskComplianceByUser";
@@ -74,6 +75,8 @@ export default function KPIScreen() {
                   <p className={styles.chartMeta}>
                     {kpi.key === "compliance"
                       ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
+                      : kpi.key === "precision"
+                        ? "Comparativo de tiempo estimado vs tiempo real del usuario activo"
                       : kpi.hasHistory
                         ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
                         : "Sin historial: mostrando valor actual"}
@@ -94,6 +97,8 @@ export default function KPIScreen() {
                     <UserComplianceChart data={complianceByUser} />
                   )}
                 </>
+              ) : kpi.key === "precision" ? (
+                <PrecisionEstimationChart comparison={kpi.estimationComparison} />
               ) : (
                 <MiniChart
                   data={kpi.chartData}
