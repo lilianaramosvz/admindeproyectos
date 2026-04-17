@@ -18,6 +18,12 @@
   align-items: center;
 }
 
+.actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
 .icon {
   width: 36px;
   height: 36px;
@@ -34,6 +40,27 @@
   border-radius: 999px;
 }
 
+.infoButton {
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 600;
+  height: 24px;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  width: 24px;
+}
+
+.infoButton:hover {
+  box-shadow: var(--shadow-md);
+}
+
 .title {
   margin-top: 12px;
   font-size: 22px;
@@ -45,11 +72,23 @@
   font-size: 13px;
 }
 
+.infoPanel {
+  background: rgba(220, 223, 229, 0.22);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+  margin-top: 10px;
+  padding: 8px 10px;
+}
+
 .chart {
   margin-top: 12px;
-  height: 50px;
-  background: linear-gradient(to top, var(--border-light), transparent);
-  border-radius: 6px;
+  height: 68px;
+  border-radius: 10px;
+  background: linear-gradient(to top, rgba(220, 223, 229, 0.22), transparent);
+  overflow: hidden;
 }
 
 .blue .icon {

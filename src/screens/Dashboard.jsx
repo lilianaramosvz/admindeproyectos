@@ -2,16 +2,25 @@
 import MainLayout from "../components/layout/MainLayout";
 import KpiCard from "../components/dashboard/KpiCard";
 import { useKpis } from "../features/hooks/useKpis";
+import { useKpiContext } from "../features/hooks/useKpiContext";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
 import styles from "../styles/screens/Dashboard.module.css";
 
 export default function Dashboard() {
-  const userId = Number(import.meta.env.VITE_KPI_USER_ID || 1);
-  const projectId = Number(import.meta.env.VITE_KPI_PROJECT_ID || 1);
-  const { kpis, loading } = useKpis({ userId, projectId });
+  const {
+    userId,
+    projectId,
+    sprintId,
+    userName,
+    projectName,
+    sprintName,
+    loading: contextLoading,
+    error: contextError,
+  } = useKpiContext();
+  const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
 
-  if (loading) {
+  if (contextLoading || loading) {
     return (
       <MainLayout title="Dashboard">
         <div className={styles.container}>Cargando KPIs...</div>
@@ -28,7 +37,15 @@ export default function Dashboard() {
           <p style={{ paddingTop: "12px" }}>
             ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
           </p>
+          <p className={styles.contextMeta}>
+            Usuario: {userName} | Proyecto: {projectName} | Sprint: {sprintName}
+          </p>
         </div>
+
+        {contextError ? (
+          <div className={styles.error}>{contextError}</div>
+        ) : null}
+        {error ? <div className={styles.error}>{error}</div> : null}
 
         {/*KPIS*/}
         <div className={styles.kpiGrid}>
