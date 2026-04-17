@@ -16,6 +16,12 @@
   font-size: 14px;
 }
 
+.contextMeta {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
 .kpiGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -26,4 +32,13 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 16px;
+}
+
+.error {
+  background: rgba(247, 161, 99, 0.12);
+  border: 1px solid rgba(247, 161, 99, 0.35);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  padding: 12px 14px;
 }
