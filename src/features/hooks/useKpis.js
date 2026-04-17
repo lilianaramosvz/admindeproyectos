@@ -458,10 +458,10 @@ const getMetricRequest = (metric, userId, projectId, sprintId) => {
   }
 
   if (metric.scope === "sprint") {
-    return metric.fetcher(sprintId);
+    return metric.fetcher(userId, sprintId);
   }
 
-  return metric.fetcher(projectId);
+  return metric.fetcher(userId, projectId);
 };
 
 export function useKpis({ userId, projectId, sprintId = projectId }) {

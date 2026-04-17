@@ -77,7 +77,7 @@ export default function MiniChart({
             top: 8,
             right: 12,
             left: compact ? 0 : 40,
-            bottom: compact ? 0 : 20,
+            bottom: compact ? 0 : 30,
           }}
         >
           <defs>
@@ -120,7 +120,7 @@ export default function MiniChart({
                 ? {
                     value: unit,
                     angle: -90,
-                    position: "insideLeft",
+                    position: "left",
                     offset: 10,
                     fill: "var(--text-tertiary)",
                     fontSize: 11,
