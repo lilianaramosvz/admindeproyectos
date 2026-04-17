@@ -33,16 +33,22 @@ export function getProjectHistory(projectId) {
   return getJson(`/api/kpis/proyecto/${projectId}/history`);
 }
 
-export function getSprintCompliance(sprintId) {
-  return getJson(`/api/kpis/sprint/${sprintId}/cumplimiento`);
+export function getSprintCompliance(userId, sprintId) {
+  return getJson(`/api/kpis/usuario/${userId}/sprint/${sprintId}/cumplimiento`);
 }
 
-export function getSprintDuration(sprintId) {
-  return getJson(`/api/kpis/sprint/${sprintId}/duracion`);
+export function getSprintDuration(userId, sprintId) {
+  return getJson(`/api/kpis/usuario/${userId}/sprint/${sprintId}/duracion`);
 }
 
-export function getProjectCycleTime(projectId) {
-  return getJson(`/api/kpis/proyecto/${projectId}/tiempo-ciclo`);
+export function getProjectCycleTime(userId, projectId) {
+  return getJson(`/api/kpis/usuario/${userId}/proyecto/${projectId}/tiempo-ciclo`);
+}
+
+export function getUserKPIHistory(userId, sprintId, tipoKPI) {
+  return getJson(
+    `/api/kpis/usuario/${userId}/sprint/${sprintId}/history/tipo/${tipoKPI}`,
+  );
 }
 
 export function getActiveUsers() {
