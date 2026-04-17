@@ -11,6 +11,21 @@ const toNumberOrNull = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const getLatestSprint = (sprints) => {
+  if (!Array.isArray(sprints) || sprints.length === 0) return null;
+
+  return [...sprints].sort((left, right) => {
+    const leftId = Number(left?.id);
+    const rightId = Number(right?.id);
+
+    if (Number.isFinite(leftId) && Number.isFinite(rightId)) {
+      return rightId - leftId;
+    }
+
+    return 0;
+  })[0];
+};
+
 export function useKpiContext() {
   const [context, setContext] = useState({
     userId: null,
@@ -49,9 +64,10 @@ export function useKpiContext() {
           toNumberOrNull(import.meta.env.VITE_KPI_PROJECT_ID) ??
           projects?.[0]?.id ??
           null;
+        const latestSprint = getLatestSprint(sprints);
         const selectedSprintId =
           toNumberOrNull(import.meta.env.VITE_KPI_SPRINT_ID) ??
-          sprints?.[0]?.id ??
+          latestSprint?.id ??
           selectedProjectId;
 
         const selectedUser = users?.find((item) => item.id === selectedUserId);

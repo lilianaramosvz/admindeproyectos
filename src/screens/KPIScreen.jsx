@@ -7,6 +7,7 @@ import SprintDurationChart from "../components/dashboard/SprintDurationChart";
 import CycleTimeHistogramChart from "../components/dashboard/CycleTimeHistogramChart";
 import { useKpis } from "../features/hooks/useKpis";
 import { useKpiContext } from "../features/hooks/useKpiContext";
+import { usePrecisionEstimationByUser } from "../features/hooks/usePrecisionEstimationByUser";
 import { useTaskComplianceByUser } from "../features/hooks/useTaskComplianceByUser";
 import UserComplianceChart from "../components/dashboard/UserComplianceChart";
 
@@ -29,6 +30,11 @@ export default function KPIScreen() {
     loading: complianceLoading,
     error: complianceError,
   } = useTaskComplianceByUser(sprintId);
+  const {
+    data: precisionByUser,
+    loading: precisionLoading,
+    error: precisionError,
+  } = usePrecisionEstimationByUser(sprintId);
 
   if (contextLoading || loading) {
     return <div className={styles.container}>Cargando KPIs...</div>;
@@ -78,7 +84,7 @@ export default function KPIScreen() {
                     {kpi.key === "compliance"
                       ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
                       : kpi.key === "precision"
-                        ? "Comparativo de tiempo estimado vs tiempo real del usuario activo"
+                        ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
                         : kpi.key === "duration"
                           ? "Comparativo de tiempo real del sprint vs tiempo planificado"
                           : kpi.key === "cycleTime"
@@ -104,7 +110,18 @@ export default function KPIScreen() {
                   )}
                 </>
               ) : kpi.key === "precision" ? (
-                <PrecisionEstimationChart comparison={kpi.estimationComparison} />
+                <>
+                  {precisionError ? (
+                    <div className={styles.error}>{precisionError}</div>
+                  ) : null}
+                  {precisionLoading ? (
+                    <div className={styles.chartMeta}>
+                      Cargando precisión de estimación por usuario...
+                    </div>
+                  ) : (
+                    <PrecisionEstimationChart data={precisionByUser} />
+                  )}
+                </>
               ) : kpi.key === "duration" ? (
                 <SprintDurationChart comparison={kpi.durationComparison} />
               ) : kpi.key === "cycleTime" ? (
