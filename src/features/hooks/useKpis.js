@@ -88,7 +88,7 @@ const KPI_DEFINITIONS = [
     historyType: "DURACION_SPRINT",
     color: "blue",
     scope: "sprint",
-    unit: "días",
+    unit: "%",
     aliases: ["duracion", "duration", "sprintduration", "sprint duración"],
     valueFields: [
       "efficiencyPercentage",
@@ -497,6 +497,68 @@ const extractEstimationComparison = (snapshot) => {
   };
 };
 
+const extractDurationComparison = (snapshot) => {
+  if (!snapshot || typeof snapshot !== "object") {
+    return null;
+  }
+
+  const realRaw = selectValueFromObject(snapshot, [
+    "realHours",
+    "actualHours",
+    "horasReales",
+    "tiempoReal",
+    "real",
+  ]);
+  const plannedRaw = selectValueFromObject(snapshot, [
+    "plannedHours",
+    "estimatedHours",
+    "horasPlanificadas",
+    "tiempoPlanificado",
+    "planificado",
+    "estimado",
+  ]);
+
+  const real = toNumber(realRaw);
+  const planned = toNumber(plannedRaw);
+
+  if (real !== null && planned !== null && planned > 0) {
+    return {
+      real,
+      planned,
+      unit: "hrs",
+    };
+  }
+
+  const details = extractTextFromObject(snapshot, [
+    "calculationDetails",
+    "calculoDetalles",
+    "details",
+    "detalle",
+  ]);
+
+  if (!details) {
+    return null;
+  }
+
+  // Backend format: "58.0 / 63.0 hrs" => real / planificado
+  const pairMatch = details.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (!pairMatch) {
+    return null;
+  }
+
+  const parsedReal = toNumber(pairMatch[1]);
+  const parsedPlanned = toNumber(pairMatch[2]);
+  if (parsedReal === null || parsedPlanned === null || parsedPlanned <= 0) {
+    return null;
+  }
+
+  return {
+    real: parsedReal,
+    planned: parsedPlanned,
+    unit: /hr|hora/i.test(details) ? "hrs" : "",
+  };
+};
+
 const getCurrentValue = (snapshot, chartData, metric) => {
   if (snapshot && typeof snapshot === "object") {
     const directValue = selectValueFromObject(snapshot, metric.valueFields);
@@ -596,18 +658,71 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
             metric.key === "precision"
               ? extractEstimationComparison(snapshot)
               : null;
+          const durationComparison =
+            metric.key === "duration"
+              ? extractDurationComparison(snapshot)
+              : null;
+
+          const durationChartData = durationComparison
+            ? [
+                {
+                  value: durationComparison.real,
+                  label: "Tiempo real",
+                  date: null,
+                },
+                {
+                  value: durationComparison.planned,
+                  label: "Tiempo planificado",
+                  date: null,
+                },
+              ]
+            : null;
+
+          const durationRatio = durationComparison
+            ? (durationComparison.real / durationComparison.planned) * 100
+            : null;
+
+          const displayValue =
+            metric.key === "duration" && durationComparison
+              ? (() => {
+                  const durationPercent = normalizeMetricValue(currentValue, {
+                    ...metric,
+                    unit: "%",
+                  });
+
+                  if (durationPercent === null) {
+                    return "Sin datos";
+                  }
+
+                  return `${durationPercent.toFixed(2)}%`;
+                })()
+              : formatMetricValue(currentValue, metric);
+
+          const displaySubtitle =
+            metric.key === "duration" && durationRatio !== null
+              ? undefined
+              : undefined;
+
+          const displayChartData = durationChartData ?? chartData;
+          const displayUnit =
+            metric.key === "duration" && durationComparison
+              ? durationComparison.unit
+              : metric.unit;
+          const displayHasHistory = durationChartData ? false : chartMeta.hasHistory;
 
           return {
             key: metric.key,
             title: metric.title,
-            value: formatMetricValue(currentValue, metric),
+            value: displayValue,
             change: statusBadgeText || trendMessage || "Sin cambios",
             statusMessage: fullStatusMessage,
             color: metric.color,
-            chartData,
-            unit: metric.unit,
-            hasHistory: chartMeta.hasHistory,
+            chartData: displayChartData,
+            unit: displayUnit,
+            hasHistory: displayHasHistory,
+            subtitle: displaySubtitle,
             estimationComparison,
+            durationComparison,
           };
         });
 
