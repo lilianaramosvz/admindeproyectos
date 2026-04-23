@@ -11,6 +11,28 @@ import {
 } from "recharts";
 import styles from "../../styles/components/dashboard/SprintDurationChart.module.css";
 
+const COLOR_MAP = {
+  blue: "var(--blue)",
+  green: "var(--green)",
+  purple: "var(--purple)",
+  orange: "var(--orange)",
+  yellow: "var(--yellow)",
+  darkblue: "var(--darkblue)",
+  pink: "var(--pink)",
+  aqua: "var(--aqua)",
+};
+
+const SOFT_COLOR_MAP = {
+  blue: "var(--blue-chart-soft)",
+  green: "var(--green-chart-soft)",
+  purple: "var(--purple-chart-soft)",
+  orange: "var(--orange-chart-soft)",
+  yellow: "var(--yellow-chart-soft)",
+  darkblue: "var(--darkblue-chart-soft)",
+  pink: "var(--pink-chart-soft)",
+  aqua: "var(--aqua-chart-soft)",
+};
+
 function formatHours(value, unit) {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return `0 ${unit}`.trim();
@@ -46,7 +68,10 @@ function ValueLabel({ x, y, width, height, value, unit }) {
   );
 }
 
-export default function CycleTimeHistogramChart({ comparison }) {
+export default function CycleTimeHistogramChart({ comparison, color = "green" }) {
+  const primaryColor = COLOR_MAP[color] || COLOR_MAP.green;
+  const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.green;
+
   if (!comparison) {
     return <div className={styles.emptyState}>Sin detalle de tiempo de ciclo</div>;
   }
@@ -95,14 +120,14 @@ export default function CycleTimeHistogramChart({ comparison }) {
           />
           <Tooltip
             content={(props) => <CycleTooltip {...props} unit={unit} />}
-            cursor={{ fill: "rgba(84, 214, 170, 0.10)" }}
+            cursor={{ fill: secondaryColor, fillOpacity: 0.2 }}
             wrapperStyle={{ outline: "none" }}
           />
           <Bar dataKey="value" radius={[8, 8, 0, 0]} maxBarSize={54}>
             {chartData.map((entry) => (
               <Cell
                 key={entry.key}
-                fill={entry.key === "expected" ? "var(--green)" : "var(--darkblue)"}
+                fill={entry.key === "expected" ? secondaryColor : primaryColor}
               />
             ))}
             <LabelList

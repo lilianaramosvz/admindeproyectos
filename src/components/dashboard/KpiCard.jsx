@@ -1,6 +1,5 @@
 //frontend\src\components\dashboard\KpiCard.jsx
 import styles from "../../styles/components/dashboard/KpiCard.module.css";
-import MiniChart from "./MiniChart";
 import { useState } from "react";
 
 export default function KpiCard({
@@ -10,13 +9,9 @@ export default function KpiCard({
   statusMessage,
   color = "blue",
   subtitle,
-  showChart = true,
-  chartData = [],
 }) {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const colorClass = styles[color] || "";
-  const hasChartData =
-    showChart && Array.isArray(chartData) && chartData.length > 0;
   const hasStatusMessage = Boolean(
     statusMessage && String(statusMessage).trim(),
   );
@@ -48,14 +43,6 @@ export default function KpiCard({
 
       {hasStatusMessage && isInfoOpen ? (
         <div className={styles.infoPanel}>{statusMessage}</div>
-      ) : null}
-
-      {showChart ? (
-        <div className={styles.chart}>
-          {hasChartData ? (
-            <MiniChart data={chartData} color={color} compact />
-          ) : null}
-        </div>
       ) : null}
     </div>
   );

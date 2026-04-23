@@ -11,6 +11,28 @@ import {
 } from "recharts";
 import styles from "../../styles/components/dashboard/SprintDurationChart.module.css";
 
+const COLOR_MAP = {
+  blue: "var(--blue)",
+  green: "var(--green)",
+  purple: "var(--purple)",
+  orange: "var(--orange)",
+  yellow: "var(--yellow)",
+  darkblue: "var(--darkblue)",
+  pink: "var(--pink)",
+  aqua: "var(--aqua)",
+};
+
+const SOFT_COLOR_MAP = {
+  blue: "var(--blue-chart-soft)",
+  green: "var(--green-chart-soft)",
+  purple: "var(--purple-chart-soft)",
+  orange: "var(--orange-chart-soft)",
+  yellow: "var(--yellow-chart-soft)",
+  darkblue: "var(--darkblue-chart-soft)",
+  pink: "var(--pink-chart-soft)",
+  aqua: "var(--aqua-chart-soft)",
+};
+
 function formatHours(value, unit) {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return `0 ${unit}`.trim();
@@ -46,7 +68,10 @@ function ValueLabel({ x, y, width, height, value, unit }) {
   );
 }
 
-export default function SprintDurationChart({ comparison }) {
+export default function SprintDurationChart({ comparison, color = "blue" }) {
+  const primaryColor = COLOR_MAP[color] || COLOR_MAP.blue;
+  const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.blue;
+
   if (!comparison) {
     return <div className={styles.emptyState}>Sin detalle de duración</div>;
   }
@@ -98,14 +123,14 @@ export default function SprintDurationChart({ comparison }) {
           />
           <Tooltip
             content={(props) => <DurationTooltip {...props} unit={unit} />}
-            cursor={{ fill: "rgba(108, 162, 248, 0.08)" }}
+            cursor={{ fill: secondaryColor, fillOpacity: 0.2 }}
             wrapperStyle={{ outline: "none" }}
           />
           <Bar dataKey="value" radius={[0, 8, 8, 0]} maxBarSize={26}>
             {chartData.map((entry) => (
               <Cell
                 key={entry.key}
-                fill={entry.key === "planned" ? "var(--blue)" : "var(--darkblue)"}
+                fill={entry.key === "planned" ? secondaryColor : primaryColor}
               />
             ))}
             <LabelList

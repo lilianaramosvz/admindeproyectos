@@ -43,7 +43,7 @@ export default function SettingsScreen() {
         {/* HEADER */}
         <div className={styles.header}>
           <h1 className={styles.title}>Ajustes</h1>
-          <p style={{ paddingTop: "12px" }}>Maneja y administra tu cuenta.</p>
+          <p className={styles.headerDescription}>Maneja y administra tu cuenta.</p>
         </div>
 
         <div className={styles.card}>
@@ -62,11 +62,8 @@ export default function SettingsScreen() {
                   </div>
 
                   <button
-                    className={styles.edit}
+                    className={`${styles.edit} ${!field.editable ? styles.editHidden : ""}`}
                     onClick={() => handleEdit(field.key)}
-                    style={{
-                      visibility: field.editable ? "visible" : "hidden",
-                    }}
                   >
                     Editar
                   </button>

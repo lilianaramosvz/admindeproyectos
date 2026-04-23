@@ -1,5 +1,7 @@
 //frontend\src\services\api.js
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://sammy-ulfh.dev";
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV ? "" : "https://sammy-ulfh.dev");
 
 async function getJson(path) {
   const res = await fetch(`${BASE_URL}${path}`);

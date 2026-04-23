@@ -16,6 +16,10 @@
   font-size: 14px;
 }
 
+.headerDescription {
+  padding-top: 12px;
+}
+
 .bottom {
   width: 100%;
 }

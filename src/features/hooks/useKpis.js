@@ -792,22 +792,25 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
 
                     return `${cyclePercent.toFixed(1)}%`;
                   })()
-              : formatMetricValue(currentValue, metric);
+                : formatMetricValue(currentValue, metric);
 
           const displaySubtitle =
             metric.key === "duration" && durationRatio !== null
               ? undefined
               : undefined;
 
-          const displayChartData = durationChartData ?? cycleTimeChartData ?? chartData;
+          const displayChartData =
+            durationChartData ?? cycleTimeChartData ?? chartData;
           const displayUnit =
             metric.key === "duration" && durationComparison
               ? durationComparison.unit
               : metric.key === "cycleTime" && cycleTimeComparison
                 ? cycleTimeComparison.unit
-              : metric.unit;
+                : metric.unit;
           const displayHasHistory =
-            durationChartData || cycleTimeChartData ? false : chartMeta.hasHistory;
+            durationChartData || cycleTimeChartData
+              ? false
+              : chartMeta.hasHistory;
 
           return {
             key: metric.key,

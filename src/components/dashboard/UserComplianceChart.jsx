@@ -13,10 +13,33 @@ import styles from "../../styles/components/dashboard/UserComplianceChart.module
 
 const MAX_PERCENT = 100;
 
-function getBarColor(value) {
-  if (value >= 80) return "var(--orange)";
-  if (value >= 60) return "var(--orange)";
-  return "var(--orange-chart-soft, rgba(249, 115, 22, 0.28))";
+const COLOR_MAP = {
+  blue: "var(--blue)",
+  green: "var(--green)",
+  purple: "var(--purple)",
+  orange: "var(--orange)",
+  yellow: "var(--yellow)",
+  darkblue: "var(--darkblue)",
+  pink: "var(--pink)",
+  aqua: "var(--aqua)",
+};
+
+const SOFT_COLOR_MAP = {
+  blue: "var(--blue-chart-soft)",
+  green: "var(--green-chart-soft)",
+  purple: "var(--purple-chart-soft)",
+  orange: "var(--orange-chart-soft)",
+  yellow: "var(--yellow-chart-soft)",
+  darkblue: "var(--darkblue-chart-soft)",
+  pink: "var(--pink-chart-soft)",
+  aqua: "var(--aqua-chart-soft)",
+};
+
+function getBarColor(value, color) {
+  const strongColor = COLOR_MAP[color] || COLOR_MAP.orange;
+  const softColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.orange;
+  if (value >= 80) return strongColor;
+  return softColor;
 }
 
 function formatPercent(value) {
@@ -82,7 +105,7 @@ function ComplianceTooltip({ active, payload, label }) {
   );
 }
 
-export default function UserComplianceChart({ data = [] }) {
+export default function UserComplianceChart({ data = [], color = "orange" }) {
   if (!Array.isArray(data) || data.length === 0) {
     return <div className={styles.emptyState}>Sin datos por usuario</div>;
   }
@@ -131,7 +154,10 @@ export default function UserComplianceChart({ data = [] }) {
           />
           <Tooltip
             content={(props) => <ComplianceTooltip {...props} />}
-            cursor={{ fill: "var(--chart-cursor-orange, rgba(251,146,60,.08))" }}
+            cursor={{
+              fill: SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.orange,
+              fillOpacity: 0.2,
+            }}
             wrapperStyle={{ outline: "none" }}
           />
           <Bar
@@ -144,7 +170,7 @@ export default function UserComplianceChart({ data = [] }) {
             {data.map((entry) => (
               <Cell
                 key={entry.userId ?? entry.label}
-                fill={getBarColor(entry.value)}
+                fill={getBarColor(entry.value, color)}
               />
             ))}
           </Bar>

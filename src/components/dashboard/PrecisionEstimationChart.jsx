@@ -9,6 +9,28 @@ import {
 } from "recharts";
 import styles from "../../styles/components/dashboard/PrecisionEstimationChart.module.css";
 
+const COLOR_MAP = {
+  blue: "var(--blue)",
+  green: "var(--green)",
+  purple: "var(--purple)",
+  orange: "var(--orange)",
+  yellow: "var(--yellow)",
+  darkblue: "var(--darkblue)",
+  pink: "var(--pink)",
+  aqua: "var(--aqua)",
+};
+
+const SOFT_COLOR_MAP = {
+  blue: "var(--blue-chart-soft)",
+  green: "var(--green-chart-soft)",
+  purple: "var(--purple-chart-soft)",
+  orange: "var(--orange-chart-soft)",
+  yellow: "var(--yellow-chart-soft)",
+  darkblue: "var(--darkblue-chart-soft)",
+  pink: "var(--pink-chart-soft)",
+  aqua: "var(--aqua-chart-soft)",
+};
+
 function formatHours(value, unit = "hrs") {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return `0 ${unit}`.trim();
@@ -79,7 +101,10 @@ function EstimationTooltip({ active, payload }) {
   );
 }
 
-export default function PrecisionEstimationChart({ data = [] }) {
+export default function PrecisionEstimationChart({ data = [], color = "purple" }) {
+  const primaryColor = COLOR_MAP[color] || COLOR_MAP.purple;
+  const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.purple;
+
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -168,20 +193,20 @@ export default function PrecisionEstimationChart({ data = [] }) {
             />
             <Tooltip
               content={(props) => <EstimationTooltip {...props} />}
-              cursor={{ fill: "rgba(147, 197, 253, 0.20)" }}
+              cursor={{ fill: secondaryColor, fillOpacity: 0.2 }}
               wrapperStyle={{ outline: "none" }}
             />
             <Bar
               dataKey="estimatedHours"
               name="Horas estimadas"
-              fill="var(--darkblue)"
+              fill={secondaryColor}
               radius={[6, 6, 0, 0]}
               maxBarSize={30}
             />
             <Bar
               dataKey="realHours"
               name="Horas reales"
-              fill="#60a5fa"
+              fill={primaryColor}
               radius={[6, 6, 0, 0]}
               maxBarSize={30}
             />

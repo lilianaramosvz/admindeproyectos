@@ -30,14 +30,135 @@
 }
 
 .contextMeta {
+  align-items: center;
   color: var(--text-secondary);
+  display: flex;
   font-size: 13px;
   font-weight: 500;
+  gap: 12px;
   margin-top: 12px;
   padding: 12px 16px;
   background: var(--bg-secondary);
   border-radius: 8px;
   border-left: 3px solid var(--blue);
+}
+
+.sprintPicker {
+  display: inline-block;
+  margin-left: auto;
+  position: relative;
+}
+
+.sprintButton {
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  box-shadow: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  gap: 8px;
+  max-width: 190px;
+  min-height: 28px;
+  padding: 4px 10px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.sprintButton:hover {
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.sprintButton:focus-visible {
+  box-shadow: var(--shadow-md);
+  outline: none;
+}
+
+.sprintButtonLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sprintChevron {
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  height: 18px;
+  justify-content: center;
+  line-height: 1;
+  width: 18px;
+  display: inline-flex;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+.sprintChevronOpen {
+  transform: rotate(180deg);
+}
+
+.sprintMenu {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  min-width: 132px;
+  width: 132px;
+  padding: 8px;
+  position: absolute;
+  left: 0;
+  z-index: 20;
+}
+
+.sprintOption {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  font-size: 13px;
+  font-weight: 500;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 7px 10px;
+  text-align: left;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.sprintOption:hover {
+  background: var(--bg-secondary);
+}
+
+.sprintOptionSelected {
+  background: var(--bg-secondary);
+  border-left-color: var(--border-light);
+  color: var(--text-primary);
+}
+
+.sprintOptionLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sprintOptionCheck {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 16px;
+  text-align: center;
 }
 
 .kpiGrid {
@@ -117,6 +238,26 @@
 }
 
 @media (max-width: 720px) {
+  .contextMeta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sprintPicker {
+    display: block;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .sprintButton {
+    max-width: none;
+    width: 100%;
+  }
+
+  .sprintMenu {
+    min-width: 100%;
+  }
+
   .kpiGrid {
     grid-template-columns: 1fr;
   }

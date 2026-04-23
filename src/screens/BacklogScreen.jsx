@@ -9,7 +9,7 @@ export default function BacklogScreen() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Backlog</h1>
-          <p style={{ paddingTop: "12px" }}>
+          <p className={styles.headerDescription}>
             Encuentra aquí todas las tareas y planeación futura.
           </p>
         </div>
