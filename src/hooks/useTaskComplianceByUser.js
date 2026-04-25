@@ -1,6 +1,6 @@
-//frontend\src\features\hooks\useTaskComplianceByUser.js
+//frontend\src\hooks\useTaskComplianceByUser.js
 import { useEffect, useState } from "react";
-import { getActiveUsers, getSprintCompliance } from "../../services/api";
+import { getActiveUsers, getSprintCompliance } from "../services/api";
 
 const COMPLIANCE_FIELDS = [
   "productivityPercentage",

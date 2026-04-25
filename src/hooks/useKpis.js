@@ -1,4 +1,4 @@
-//frontend\src\features\hooks\useKpis.js
+//frontend\src\hooks\useKpis.js
 import { useEffect, useState } from "react";
 import {
   getProjectCycleTime,
@@ -6,7 +6,7 @@ import {
   getSprintCompliance,
   getSprintDuration,
   getUserPrecisionEstimation,
-} from "../../services/api";
+} from "../services/api";
 
 const KPI_DEFINITIONS = [
   {

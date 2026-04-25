@@ -1,10 +1,10 @@
-//frontend\src\features\hooks\useKpiContext.js
+//frontend\src\hooks\useKpiContext.js
 import { useEffect, useState } from "react";
 import {
   getActiveProjects,
   getActiveSprints,
   getActiveUsers,
-} from "../../services/api";
+} from "../services/api";
 
 const toNumberOrNull = (value) => {
   const parsed = Number(value);

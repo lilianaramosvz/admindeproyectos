@@ -38,7 +38,7 @@ export const sprintTasks = [
     title: "Hecho",
     tasks: [
       {
-        id: "TSK-003",
+        id: "TSK-003-A",
         title: "Desarrollo de Sprint Board",
         priority: "high",
         date: "Mar 13",
@@ -47,7 +47,7 @@ export const sprintTasks = [
         name: "Anna Ramirez",
       },
       {
-        id: "TSK-003",
+        id: "TSK-003-B",
         title: "Desarrollo de Dashboard",
         priority: "high",
         date: "Mar 13",
@@ -56,7 +56,7 @@ export const sprintTasks = [
         name: "Liliana Ramos",
       },
       {
-        id: "TSK-003",
+        id: "TSK-003-C",
         title: "Desarrollo de Tasks",
         priority: "low",
         date: "Mar 13",
@@ -65,7 +65,7 @@ export const sprintTasks = [
         name: "Anna Ramirez",
       },
       {
-        id: "TSK-003",
+        id: "TSK-003-D",
         title: "Desarrollo de Dashboard",
         priority: "high",
         date: "Mar 13",
@@ -74,7 +74,7 @@ export const sprintTasks = [
         name: "Liliana Ramos",
       },
       {
-        id: "TSK-003",
+        id: "TSK-003-E",
         title: "Desarrollo de vista de KPIS",
         priority: "high",
         date: "Mar 13",

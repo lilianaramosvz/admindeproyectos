@@ -1,8 +1,8 @@
 //frontend\src\screens\Dashboard.jsx
 import MainLayout from "../components/layout/MainLayout";
 import KpiCard from "../components/dashboard/KpiCard";
-import { useKpis } from "../features/hooks/useKpis";
-import { useKpiContext } from "../features/hooks/useKpiContext";
+import { useKpis } from "../hooks/useKpis";
+import { useKpiContext } from "../hooks/useKpiContext";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
 import styles from "../styles/screens/Dashboard.module.css";
@@ -49,8 +49,8 @@ export default function Dashboard() {
 
         {/*KPIS*/}
         <div className={styles.kpiGrid}>
-          {kpis.map((kpi) => (
-            <KpiCard key={kpi.title} {...kpi} />
+          {kpis.map(({ key: kpiKey, ...kpiProps }) => (
+            <KpiCard key={kpiKey} {...kpiProps} />
           ))}
         </div>
 
