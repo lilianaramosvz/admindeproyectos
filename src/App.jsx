@@ -9,22 +9,31 @@ import SettingsScreen from "./screens/SettingsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./context/ProtectedRoute";
+import { MensajeManager } from "./components/message/MensajeManager"; // ← NUEVO
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
+
+function AppLayout({ children }) {
+  return <>{children}</>;
+}
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <MensajeManager />
         <Routes>
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
+
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <AppLayout>
+                  <Dashboard />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -32,7 +41,9 @@ function App() {
             path="/backlog"
             element={
               <ProtectedRoute>
-                <BacklogScreen />
+                <AppLayout>
+                  <BacklogScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -40,7 +51,9 @@ function App() {
             path="/sprint"
             element={
               <ProtectedRoute>
-                <SprintScreen />
+                <AppLayout>
+                  <SprintScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -48,7 +61,9 @@ function App() {
             path="/tasks"
             element={
               <ProtectedRoute>
-                <TasksScreen />
+                <AppLayout>
+                  <TasksScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -56,7 +71,9 @@ function App() {
             path="/tareas"
             element={
               <ProtectedRoute>
-                <TasksScreen />
+                <AppLayout>
+                  <TasksScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -64,7 +81,9 @@ function App() {
             path="/kpis"
             element={
               <ProtectedRoute>
-                <KPIScreen />
+                <AppLayout>
+                  <KPIScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -72,7 +91,9 @@ function App() {
             path="/settings"
             element={
               <ProtectedRoute>
-                <SettingsScreen />
+                <AppLayout>
+                  <SettingsScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
@@ -80,7 +101,9 @@ function App() {
             path="/ajustes"
             element={
               <ProtectedRoute>
-                <SettingsScreen />
+                <AppLayout>
+                  <SettingsScreen />
+                </AppLayout>
               </ProtectedRoute>
             }
           />
