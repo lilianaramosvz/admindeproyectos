@@ -1,3 +1,4 @@
+//frontend\src\components\dashboard\CycleTimeHistogramChart.jsx
 import {
   Bar,
   BarChart,
@@ -48,7 +49,9 @@ function CycleTooltip({ active, payload, unit }) {
   return (
     <div className={styles.tooltip}>
       <div className={styles.tooltipLabel}>{point.label}</div>
-      <div className={styles.tooltipValue}>{formatHours(point.value, unit)}</div>
+      <div className={styles.tooltipValue}>
+        {formatHours(point.value, unit)}
+      </div>
     </div>
   );
 }
@@ -68,12 +71,19 @@ function ValueLabel({ x, y, width, height, value, unit }) {
   );
 }
 
-export default function CycleTimeHistogramChart({ comparison, color = "green" }) {
+export default function CycleTimeHistogramChart({
+  comparison,
+  color = "green",
+}) {
   const primaryColor = COLOR_MAP[color] || COLOR_MAP.green;
   const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.green;
 
   if (!comparison) {
-    return <div className={styles.emptyState}>Sin detalle de tiempo de ciclo</div>;
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateText}>Sin detalle de tiempo de ciclo</p>
+      </div>
+    );
   }
 
   const unit = comparison.unit || "hrs";

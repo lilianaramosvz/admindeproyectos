@@ -9,7 +9,7 @@ import SettingsScreen from "./screens/SettingsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./context/ProtectedRoute";
-import { MensajeManager } from "./components/message/MensajeManager"; // ← NUEVO
+import { MensajeManager } from "./components/messageKafka/MensajeManager"; 
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";

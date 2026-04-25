@@ -416,6 +416,23 @@ const getStatusBadgeText = (statusMessage) => {
   const hasAlertIcon = icon.includes("!");
   const restMessage = icon ? message.slice(icon.length).trim() : message;
   const shortBlock = restMessage.split(":")[0].trim();
+  const noDataPattern = /^(?:no\s+hay|sin\s+datos)\b/i;
+  const noAssignedTasksPattern =
+    /(?:no\s+tiene\s+tareas\s+asignadas|sin\s+tareas\s+asignadas|no\s+ha\s+completado\s+tareas)\b/i;
+  const resultLabelMatch = shortBlock.match(/^((?:buen|mal)\s+resultado)\b/i);
+
+  if (
+    noDataPattern.test(shortBlock) ||
+    noAssignedTasksPattern.test(shortBlock)
+  ) {
+    return "No hay datos";
+  }
+
+  if (resultLabelMatch) {
+    const resultLabel = resultLabelMatch[1];
+    return icon ? `${icon} ${resultLabel}` : resultLabel;
+  }
+
   const firstWord = shortBlock.split(/\s+/)[0] || "";
 
   if (hasAlertIcon) {
