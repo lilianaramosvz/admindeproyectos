@@ -221,6 +221,14 @@
   margin-left: auto;
 }
 
+.chartValueDuration {
+  margin-top: 8px;
+}
+
+.chartValueDurationZero {
+  margin-top: 14px;
+}
+
 .chartCard :global(.recharts-responsive-container) {
   min-height: 220px;
 }

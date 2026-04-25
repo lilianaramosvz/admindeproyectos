@@ -1,3 +1,4 @@
+//frontend\src\features\hooks\usePrecisionEstimationByUser.js
 import { useEffect, useState } from "react";
 import { getActiveUsers, getSprintDuration } from "../../services/api";
 
@@ -187,13 +188,17 @@ export function usePrecisionEstimationByUser(sprintId) {
               result.value,
             );
 
-            if (!Number.isFinite(estimatedHours) || !Number.isFinite(realHours)) {
+            if (
+              !Number.isFinite(estimatedHours) ||
+              !Number.isFinite(realHours)
+            ) {
               return null;
             }
 
             const precisionFromSnapshot = extractPrecisionPercent(result.value);
             const precision =
-              precisionFromSnapshot ?? derivePrecision(estimatedHours, realHours);
+              precisionFromSnapshot ??
+              derivePrecision(estimatedHours, realHours);
 
             return {
               userId: user.id,

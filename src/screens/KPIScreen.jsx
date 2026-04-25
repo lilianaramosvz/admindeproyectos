@@ -219,7 +219,15 @@ export default function KPIScreen() {
                               : "Sin historial: mostrando valor actual"}
                   </p>
                 </div>
-                <span className={styles.chartValue}>{kpi.value}</span>
+                <span
+                  className={`${styles.chartValue} ${kpi.key === "duration" ? styles.chartValueDuration : ""} ${
+                    kpi.key === "duration" && /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
+                      ? styles.chartValueDurationZero
+                      : ""
+                  }`}
+                >
+                  {kpi.value}
+                </span>
               </div>
               {kpi.key === "compliance" ? (
                 <>

@@ -107,7 +107,11 @@ function ComplianceTooltip({ active, payload, label }) {
 
 export default function UserComplianceChart({ data = [], color = "orange" }) {
   if (!Array.isArray(data) || data.length === 0) {
-    return <div className={styles.emptyState}>Sin datos por usuario</div>;
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateText}>Sin datos por usuario</p>
+      </div>
+    );
   }
 
   const longestLabel = data.reduce((max, item) => {
@@ -116,7 +120,7 @@ export default function UserComplianceChart({ data = [], color = "orange" }) {
 
   const rightMargin = 90;
   const yAxisWidth = Math.min(240, Math.max(160, longestLabel * 7));
-  const dynamicHeight = Math.max(280, data.length * 72);
+  const dynamicHeight = Math.max(180, data.length * 48);
 
   return (
     <div className={styles.root} style={{ height: `${dynamicHeight}px` }}>

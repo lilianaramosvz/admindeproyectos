@@ -1,3 +1,4 @@
+//frontend\src\components\dashboard\SprintDurationChart.jsx
 import {
   Bar,
   BarChart,
@@ -48,7 +49,9 @@ function DurationTooltip({ active, payload, unit }) {
   return (
     <div className={styles.tooltip}>
       <div className={styles.tooltipLabel}>{point.label}</div>
-      <div className={styles.tooltipValue}>{formatHours(point.value, unit)}</div>
+      <div className={styles.tooltipValue}>
+        {formatHours(point.value, unit)}
+      </div>
     </div>
   );
 }
@@ -73,7 +76,11 @@ export default function SprintDurationChart({ comparison, color = "blue" }) {
   const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.blue;
 
   if (!comparison) {
-    return <div className={styles.emptyState}>Sin detalle de duración</div>;
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateText}>Sin detalle de duración</p>
+      </div>
+    );
   }
 
   const unit = comparison.unit || "hrs";
