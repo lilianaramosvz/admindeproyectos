@@ -1,3 +1,4 @@
+//frontend\src\components\dashboard\PrecisionEstimationChart.jsx
 import {
   Bar,
   BarChart,
@@ -82,7 +83,9 @@ function EstimationTooltip({ active, payload }) {
   const point = payload[0]?.payload;
   if (!point) return null;
 
-  const estimatedValue = payload.find((item) => item.dataKey === "estimatedHours");
+  const estimatedValue = payload.find(
+    (item) => item.dataKey === "estimatedHours",
+  );
   const realValue = payload.find((item) => item.dataKey === "realHours");
   const unit = point.unit || "hrs";
   const deltaInfo = getDeltaInfo(point.estimatedHours, point.realHours);
@@ -93,7 +96,9 @@ function EstimationTooltip({ active, payload }) {
       <div className={styles.tooltipValue}>
         Estimadas: {formatHours(estimatedValue?.value, unit)}
       </div>
-      <div className={styles.tooltipValue}>Reales: {formatHours(realValue?.value, unit)}</div>
+      <div className={styles.tooltipValue}>
+        Reales: {formatHours(realValue?.value, unit)}
+      </div>
       <div className={styles.tooltipMeta}>
         {deltaInfo.label}: {formatHours(Math.abs(deltaInfo.delta), unit)}
       </div>
@@ -101,7 +106,10 @@ function EstimationTooltip({ active, payload }) {
   );
 }
 
-export default function PrecisionEstimationChart({ data = [], color = "purple" }) {
+export default function PrecisionEstimationChart({
+  data = [],
+  color = "purple",
+}) {
   const primaryColor = COLOR_MAP[color] || COLOR_MAP.purple;
   const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.purple;
 
@@ -168,7 +176,10 @@ export default function PrecisionEstimationChart({ data = [], color = "purple" }
 
   return (
     <div className={styles.root}>
-      <div className={styles.chartWrapper} style={{ height: `${dynamicHeight}px` }}>
+      <div
+        className={styles.chartWrapper}
+        style={{ height: `${dynamicHeight}px` }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}

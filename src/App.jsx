@@ -9,7 +9,8 @@ import SettingsScreen from "./screens/SettingsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./context/ProtectedRoute";
-import { MensajeManager } from "./components/messageKafka/MensajeManager"; 
+import { MensajeManager } from "./components/messageKafka/MensajeManager";
+import AsistenteIAScreen from "./screens/AsistenteIAScreen";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
@@ -107,6 +108,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/asistencia-ia"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <AsistenteIAScreen />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>

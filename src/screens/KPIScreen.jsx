@@ -6,10 +6,10 @@ import MiniChart from "../components/dashboard/MiniChart";
 import PrecisionEstimationChart from "../components/dashboard/PrecisionEstimationChart";
 import SprintDurationChart from "../components/dashboard/SprintDurationChart";
 import CycleTimeHistogramChart from "../components/dashboard/CycleTimeHistogramChart";
-import { useKpis } from "../features/hooks/useKpis";
-import { useKpiContext } from "../features/hooks/useKpiContext";
-import { usePrecisionEstimationByUser } from "../features/hooks/usePrecisionEstimationByUser";
-import { useTaskComplianceByUser } from "../features/hooks/useTaskComplianceByUser";
+import { useKpis } from "../hooks/useKpis";
+import { useKpiContext } from "../hooks/useKpiContext";
+import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
+import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import UserComplianceChart from "../components/dashboard/UserComplianceChart";
 import { getActiveSprints } from "../services/api";
 
@@ -93,7 +93,9 @@ export default function KPIScreen() {
 
   const effectiveSprintId = selectedSprintId ?? sprintId;
   const selectedSprintName = useMemo(() => {
-    const selected = availableSprints.find((item) => item.id === effectiveSprintId);
+    const selected = availableSprints.find(
+      (item) => item.id === effectiveSprintId,
+    );
     return selected?.nombre || sprintName;
   }, [availableSprints, effectiveSprintId, sprintName]);
 
@@ -127,7 +129,9 @@ export default function KPIScreen() {
             desempeño y progreso.
           </p>
           <p className={styles.contextMeta}>
-            <span>Usuario: {userName} | Proyecto: {projectName}</span>
+            <span>
+              Usuario: {userName} | Proyecto: {projectName}
+            </span>
             <span className={styles.sprintPicker} ref={sprintDropdownRef}>
               <button
                 type="button"
@@ -136,7 +140,9 @@ export default function KPIScreen() {
                 aria-expanded={isSprintMenuOpen}
                 aria-haspopup="listbox"
               >
-                <span className={styles.sprintButtonLabel}>{selectedSprintName}</span>
+                <span className={styles.sprintButtonLabel}>
+                  {selectedSprintName}
+                </span>
                 <span
                   className={`${styles.sprintChevron} ${isSprintMenuOpen ? styles.sprintChevronOpen : ""}`}
                   aria-hidden="true"
@@ -166,8 +172,13 @@ export default function KPIScreen() {
                           setIsSprintMenuOpen(false);
                         }}
                       >
-                        <span className={styles.sprintOptionLabel}>{item.nombre}</span>
-                        <span className={styles.sprintOptionCheck} aria-hidden="true">
+                        <span className={styles.sprintOptionLabel}>
+                          {item.nombre}
+                        </span>
+                        <span
+                          className={styles.sprintOptionCheck}
+                          aria-hidden="true"
+                        >
                           {isSelected ? "✓" : ""}
                         </span>
                       </button>
@@ -186,8 +197,8 @@ export default function KPIScreen() {
 
         {/* MAIN KPIs */}
         <div className={styles.kpiGrid}>
-          {kpis.map((kpi) => (
-            <KpiCard key={kpi.title} {...kpi} />
+          {kpis.map(({ key: kpiKey, ...kpiProps }) => (
+            <KpiCard key={kpiKey} {...kpiProps} />
           ))}
         </div>
 
@@ -201,7 +212,7 @@ export default function KPIScreen() {
         {/* charts */}
         <div className={styles.charts}>
           {kpis.map((kpi) => (
-            <div key={kpi.title} className={styles.chartCard}>
+            <div key={kpi.key} className={styles.chartCard}>
               <div className={styles.chartHeader}>
                 <div>
                   <h3>{kpi.title}</h3>
@@ -221,7 +232,8 @@ export default function KPIScreen() {
                 </div>
                 <span
                   className={`${styles.chartValue} ${kpi.key === "duration" ? styles.chartValueDuration : ""} ${
-                    kpi.key === "duration" && /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
+                    kpi.key === "duration" &&
+                    /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
                       ? styles.chartValueDurationZero
                       : ""
                   }`}
@@ -239,7 +251,10 @@ export default function KPIScreen() {
                       Cargando cumplimiento por usuario...
                     </div>
                   ) : (
-                    <UserComplianceChart data={complianceByUser} color={kpi.color} />
+                    <UserComplianceChart
+                      data={complianceByUser}
+                      color={kpi.color}
+                    />
                   )}
                 </>
               ) : kpi.key === "precision" ? (
@@ -252,7 +267,10 @@ export default function KPIScreen() {
                       Cargando precisión de estimación por usuario...
                     </div>
                   ) : (
-                    <PrecisionEstimationChart data={precisionByUser} color={kpi.color} />
+                    <PrecisionEstimationChart
+                      data={precisionByUser}
+                      color={kpi.color}
+                    />
                   )}
                 </>
               ) : kpi.key === "duration" ? (

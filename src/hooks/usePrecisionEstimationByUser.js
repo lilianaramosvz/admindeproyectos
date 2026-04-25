@@ -1,6 +1,6 @@
-//frontend\src\features\hooks\usePrecisionEstimationByUser.js
+//frontend\src\hooks\usePrecisionEstimationByUser.js
 import { useEffect, useState } from "react";
-import { getActiveUsers, getSprintDuration } from "../../services/api";
+import { getActiveUsers, getSprintDuration } from "../services/api";
 
 const unwrapResponse = (response) => {
   if (response && typeof response === "object") {

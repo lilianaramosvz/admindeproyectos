@@ -13,22 +13,22 @@ async function getJson(path) {
   return res.json();
 }
 
-async function getJsonWithFallback(paths) {
-  let lastError = null;
+async function getJsonOrNull(path) {
+  const res = await fetch(`${BASE_URL}${path}`);
 
-  for (const path of paths) {
-    try {
-      return await getJson(path);
-    } catch (error) {
-      lastError = error;
-    }
+  if (res.status === 404) {
+    return null;
   }
 
-  throw lastError || new Error("No se pudo consultar la API.");
+  if (!res.ok) {
+    throw new Error(`Error ${res.status} al consultar ${path}`);
+  }
+
+  return res.json();
 }
 
 export function getUserPrecisionEstimation(userId) {
-  return getJson(`/api/kpis/usuario/${userId}/precision-estimacion`);
+  return getJsonOrNull(`/api/kpis/usuario/${userId}/precision-estimacion`);
 }
 
 export function getProjectHistory(projectId) {
@@ -36,15 +36,17 @@ export function getProjectHistory(projectId) {
 }
 
 export function getSprintCompliance(userId, sprintId) {
-  return getJson(`/api/kpis/usuario/${userId}/sprint/${sprintId}/cumplimiento`);
+  return getJsonOrNull(
+    `/api/kpis/usuario/${userId}/sprint/${sprintId}/cumplimiento`,
+  );
 }
 
 export function getSprintDuration(userId, sprintId) {
-  return getJson(`/api/kpis/usuario/${userId}/sprint/${sprintId}/duracion`);
+  return getJsonOrNull(`/api/kpis/usuario/${userId}/sprint/${sprintId}/duracion`);
 }
 
 export function getProjectCycleTime(userId, projectId) {
-  return getJson(
+  return getJsonOrNull(
     `/api/kpis/usuario/${userId}/proyecto/${projectId}/tiempo-ciclo`,
   );
 }
