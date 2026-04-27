@@ -1,6 +1,6 @@
 //frontend\src\hooks\usePrecisionEstimationByUser.js
 import { useEffect, useState } from "react";
-import { getActiveUsers, getSprintDuration } from "../services/api";
+import { getActiveUsers, getUserPrecisionEstimation } from "../services/api";
 
 const unwrapResponse = (response) => {
   if (response && typeof response === "object") {
@@ -16,7 +16,7 @@ const toNumber = (value) => {
 };
 
 const ESTIMATED_FIELDS = [
-  "expectedValue",
+  "actualValue",
   "targetValue",
   "plannedHours",
   "horasPlanificadas",
@@ -30,11 +30,11 @@ const ESTIMATED_FIELDS = [
 ];
 
 const REAL_FIELDS = [
+  "expectedValue",
   "actualHours",
   "realHours",
   "horasReales",
   "tiempoReal",
-  "actualValue",
   "currentValue",
   "actualTime",
   "real",
@@ -45,6 +45,15 @@ const DETAILS_FIELDS = [
   "calculoDetalles",
   "details",
   "detalle",
+];
+
+const STATUS_FIELDS = [
+  "statusMessage",
+  "statusMesagge",
+  "message",
+  "mensaje",
+  "descripcion",
+  "status",
 ];
 
 const selectValueFromObject = (source, fields) => {
@@ -59,11 +68,43 @@ const selectValueFromObject = (source, fields) => {
   return null;
 };
 
+const extractStatusMessage = (source) => {
+  const rawStatus = selectValueFromObject(source, STATUS_FIELDS);
+  if (rawStatus === null || rawStatus === undefined) return "";
+  return String(rawStatus).trim();
+};
+
+const normalizeHoursByStatus = ({ estimatedHours, realHours, statusMessage }) => {
+  if (!Number.isFinite(estimatedHours) || !Number.isFinite(realHours)) {
+    return { estimatedHours, realHours };
+  }
+
+  const status = String(statusMessage ?? "").toLowerCase();
+  const mentionsOverestimation = /sobreestima|sobreestimo|termina\s+antes/.test(
+    status,
+  );
+  const mentionsUnderestimation = /subestima|subestimo|termina\s+despues|termina\s+después/.test(
+    status,
+  );
+
+  if (mentionsOverestimation && estimatedHours < realHours) {
+    return { estimatedHours: realHours, realHours: estimatedHours };
+  }
+
+  if (mentionsUnderestimation && estimatedHours > realHours) {
+    return { estimatedHours: realHours, realHours: estimatedHours };
+  }
+
+  return { estimatedHours, realHours };
+};
+
 const extractEstimationHours = (response) => {
   const source = unwrapResponse(response);
   if (!source || typeof source !== "object") {
     return { estimatedHours: null, realHours: null };
   }
+
+  const statusMessage = extractStatusMessage(source);
 
   const estimatedRaw = selectValueFromObject(source, ESTIMATED_FIELDS);
   const realRaw = selectValueFromObject(source, REAL_FIELDS);
@@ -72,7 +113,11 @@ const extractEstimationHours = (response) => {
   const realHours = toNumber(realRaw);
 
   if (estimatedHours !== null && realHours !== null) {
-    return { estimatedHours, realHours };
+    return normalizeHoursByStatus({
+      estimatedHours,
+      realHours,
+      statusMessage,
+    });
   }
 
   const details = selectValueFromObject(source, DETAILS_FIELDS);
@@ -80,7 +125,7 @@ const extractEstimationHours = (response) => {
     return { estimatedHours, realHours };
   }
 
-  // Backend usually returns duration details as "real / planificado".
+  // Precision details come as "estimado / real".
   const pairMatch = String(details).match(
     /(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/,
   );
@@ -89,13 +134,14 @@ const extractEstimationHours = (response) => {
     return { estimatedHours, realHours };
   }
 
-  const parsedReal = toNumber(pairMatch[1]);
-  const parsedEstimated = toNumber(pairMatch[2]);
+  const parsedEstimated = toNumber(pairMatch[1]);
+  const parsedReal = toNumber(pairMatch[2]);
 
-  return {
+  return normalizeHoursByStatus({
     estimatedHours: estimatedHours ?? parsedEstimated,
     realHours: realHours ?? parsedReal,
-  };
+    statusMessage,
+  });
 };
 
 const extractPrecisionPercent = (response) => {
@@ -153,13 +199,6 @@ export function usePrecisionEstimationByUser(sprintId) {
     let isActive = true;
 
     async function loadPrecisionByUser() {
-      if (!Number.isFinite(sprintId)) {
-        setData([]);
-        setLoading(false);
-        setError("No hay sprint activo para calcular precisión por usuario.");
-        return;
-      }
-
       try {
         setLoading(true);
         setError(null);
@@ -174,7 +213,7 @@ export function usePrecisionEstimationByUser(sprintId) {
         }
 
         const precisionResults = await Promise.allSettled(
-          users.map((user) => getSprintDuration(user.id, sprintId)),
+          users.map((user) => getUserPrecisionEstimation(user.id)),
         );
 
         if (!isActive) return;
@@ -221,14 +260,14 @@ export function usePrecisionEstimationByUser(sprintId) {
         setData(mapped);
         if (mapped.length === 0) {
           setError(
-            "No hay datos de horas estimadas vs reales por usuario para el sprint activo.",
+            "No hay datos de horas estimadas vs reales por usuario.",
           );
         }
       } catch {
         if (!isActive) return;
         setData([]);
         setError(
-          "No se pudo cargar la comparación de horas por usuario del sprint activo.",
+          "No se pudo cargar la comparación de horas por usuario.",
         );
       } finally {
         if (isActive) setLoading(false);

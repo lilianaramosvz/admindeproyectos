@@ -1,4 +1,4 @@
-//frontend\src\components\dashboard\UserComplianceChart.jsx
+//frontend\src\components\charts\UserComplianceChart.jsx
 import {
   Bar,
   BarChart,
@@ -129,7 +129,7 @@ export default function UserComplianceChart({ data = [], color = "orange" }) {
           data={data}
           layout="vertical"
           margin={{ top: 8, right: rightMargin, bottom: 20, left: 20 }}
-          barCategoryGap={20}
+          barCategoryGap={12}
         >
           <CartesianGrid
             stroke="var(--border-light)"
@@ -167,7 +167,7 @@ export default function UserComplianceChart({ data = [], color = "orange" }) {
           <Bar
             dataKey="value"
             radius={[0, 6, 6, 0]}
-            maxBarSize={28}
+            maxBarSize={34}
             minPointSize={4}
             label={<TaskCountLabel />}
           >

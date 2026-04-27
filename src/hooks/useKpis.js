@@ -64,7 +64,7 @@ const KPI_DEFINITIONS = [
   },
   {
     key: "cycleTime",
-    title: "Tiempo de ciclo por tarea",
+    title: "Tareas por usuario",
     historyType: "TIEMPO_CICLO",
     color: "green",
     scope: "project",
@@ -455,7 +455,23 @@ const extractEstimationComparison = (snapshot) => {
     return null;
   }
 
+  const statusText = extractTextFromObject(snapshot, [
+    "statusMessage",
+    "statusMesagge",
+    "message",
+    "mensaje",
+    "descripcion",
+    "status",
+  ]);
+  const mentionsOverestimation = /sobreestima|sobreestimo|termina\s+antes/i.test(
+    String(statusText ?? ""),
+  );
+  const mentionsUnderestimation = /subestima|subestimo|termina\s+despues|termina\s+después/i.test(
+    String(statusText ?? ""),
+  );
+
   const estimatedRaw = selectValueFromObject(snapshot, [
+    "actualValue",
     "estimatedHours",
     "horasEstimadas",
     "tiempoEstimado",
@@ -463,6 +479,7 @@ const extractEstimationComparison = (snapshot) => {
     "estimado",
   ]);
   const realRaw = selectValueFromObject(snapshot, [
+    "expectedValue",
     "actualHours",
     "realHours",
     "horasReales",
@@ -475,9 +492,16 @@ const extractEstimationComparison = (snapshot) => {
   const real = toNumber(realRaw);
 
   if (estimated !== null && real !== null) {
+    const normalized =
+      mentionsOverestimation && estimated < real
+        ? { estimated: real, real: estimated }
+        : mentionsUnderestimation && estimated > real
+          ? { estimated: real, real: estimated }
+          : { estimated, real };
+
     return {
-      estimated,
-      real,
+      estimated: normalized.estimated,
+      real: normalized.real,
       unit: "hrs",
     };
   }
@@ -507,9 +531,16 @@ const extractEstimationComparison = (snapshot) => {
 
   const hasHoursUnit = /hr|hora/i.test(details);
 
+  const normalizedParsed =
+    mentionsOverestimation && parsedEstimated < parsedReal
+      ? { estimated: parsedReal, real: parsedEstimated }
+      : mentionsUnderestimation && parsedEstimated > parsedReal
+        ? { estimated: parsedReal, real: parsedEstimated }
+        : { estimated: parsedEstimated, real: parsedReal };
+
   return {
-    estimated: parsedEstimated,
-    real: parsedReal,
+    estimated: normalizedParsed.estimated,
+    real: normalizedParsed.real,
     unit: hasHoursUnit ? "hrs" : "",
   };
 };

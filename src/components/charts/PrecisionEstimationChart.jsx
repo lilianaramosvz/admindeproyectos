@@ -1,4 +1,4 @@
-//frontend\src\components\dashboard\PrecisionEstimationChart.jsx
+//frontend\src\components\charts\PrecisionEstimationChart.jsx
 import {
   Bar,
   BarChart,
@@ -213,14 +213,14 @@ export default function PrecisionEstimationChart({
             />
             <Bar
               dataKey="estimatedHours"
-              name="Horas estimadas"
+              name="Horas estimadas (actualValue)"
               fill={secondaryColor}
               radius={[6, 6, 0, 0]}
               maxBarSize={30}
             />
             <Bar
               dataKey="realHours"
-              name="Horas reales"
+              name="Horas reales (expectedValue)"
               fill={primaryColor}
               radius={[6, 6, 0, 0]}
               maxBarSize={30}
