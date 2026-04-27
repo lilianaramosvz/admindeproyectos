@@ -14,6 +14,7 @@ const COMPLIANCE_FIELDS = [
 ];
 
 const COMPLETED_FIELDS = [
+  "actualValue",
   "tareasCompletadas",
   "completedTasks",
   "completed",
@@ -24,6 +25,7 @@ const COMPLETED_FIELDS = [
 ];
 
 const ASSIGNED_FIELDS = [
+  "expectedValue",
   "tareasAsignadas",
   "assignedTasks",
   "assigned",

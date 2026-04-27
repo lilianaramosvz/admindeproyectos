@@ -1,4 +1,4 @@
-//frontend\src\components\dashboard\SprintDurationChart.jsx
+//frontend\src\components\charts\SprintDurationChart.jsx
 import {
   Bar,
   BarChart,

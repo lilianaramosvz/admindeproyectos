@@ -3,14 +3,15 @@ import MainLayout from "../components/layout/MainLayout";
 import { useEffect, useMemo, useRef, useState } from "react";
 import KpiCard from "../components/dashboard/KpiCard";
 import MiniChart from "../components/dashboard/MiniChart";
-import PrecisionEstimationChart from "../components/dashboard/PrecisionEstimationChart";
-import SprintDurationChart from "../components/dashboard/SprintDurationChart";
-import CycleTimeHistogramChart from "../components/dashboard/CycleTimeHistogramChart";
+import PrecisionEstimationChart from "../components/charts/PrecisionEstimationChart";
+import SprintDurationChart from "../components/charts/SprintDurationChart";
+import TasksByUserChart from "../components/charts/TasksByUserChart";
 import { useKpis } from "../hooks/useKpis";
+import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
-import UserComplianceChart from "../components/dashboard/UserComplianceChart";
+import UserComplianceChart from "../components/charts/UserComplianceChart";
 import { getActiveSprints } from "../services/api";
 
 import styles from "../styles/screens/KPIScreen.module.css";
@@ -114,6 +115,13 @@ export default function KPIScreen() {
     loading: precisionLoading,
     error: precisionError,
   } = usePrecisionEstimationByUser(effectiveSprintId);
+  const { kpisForCards, precisionValueFromChart, totalCompletedTasks } =
+    useKpiCardValues({
+      kpis,
+      precisionByUser,
+      precisionLoading,
+      complianceByUser,
+    });
 
   if (contextLoading || loading) {
     return <div className={styles.container}>Cargando KPIs...</div>;
@@ -197,7 +205,7 @@ export default function KPIScreen() {
 
         {/* MAIN KPIs */}
         <div className={styles.kpiGrid}>
-          {kpis.map(({ key: kpiKey, ...kpiProps }) => (
+          {kpisForCards.map(({ key: kpiKey, ...kpiProps }) => (
             <KpiCard key={kpiKey} {...kpiProps} />
           ))}
         </div>
@@ -224,7 +232,7 @@ export default function KPIScreen() {
                         : kpi.key === "duration"
                           ? "Comparativo de tiempo real del sprint vs tiempo planificado"
                           : kpi.key === "cycleTime"
-                            ? "Histograma de tiempo real promedio vs tiempo esperado por tarea"
+                            ? "Total de tareas completadas por cada integrante en el sprint activo"
                             : kpi.hasHistory
                               ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
                               : "Sin historial: mostrando valor actual"}
@@ -238,7 +246,13 @@ export default function KPIScreen() {
                       : ""
                   }`}
                 >
-                  {kpi.value}
+                  {kpi.key === "cycleTime"
+                    ? `${totalCompletedTasks.toFixed(0)} tareas`
+                    : kpi.key === "precision"
+                      ? precisionLoading
+                        ? "..."
+                        : (precisionValueFromChart ?? "Sin datos")
+                    : kpi.value}
                 </span>
               </div>
               {kpi.key === "compliance" ? (
@@ -279,10 +293,7 @@ export default function KPIScreen() {
                   color={kpi.color}
                 />
               ) : kpi.key === "cycleTime" ? (
-                <CycleTimeHistogramChart
-                  comparison={kpi.cycleTimeComparison}
-                  color={kpi.color}
-                />
+                <TasksByUserChart data={complianceByUser} color={kpi.color} />
               ) : (
                 <MiniChart
                   data={kpi.chartData}
@@ -297,3 +308,5 @@ export default function KPIScreen() {
     </MainLayout>
   );
 }
+
+

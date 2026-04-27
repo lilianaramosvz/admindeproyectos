@@ -2,7 +2,10 @@
 import MainLayout from "../components/layout/MainLayout";
 import KpiCard from "../components/dashboard/KpiCard";
 import { useKpis } from "../hooks/useKpis";
+import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
+import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
+import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
 import styles from "../styles/screens/Dashboard.module.css";
@@ -19,6 +22,15 @@ export default function Dashboard() {
     error: contextError,
   } = useKpiContext();
   const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
+  const { data: complianceByUser } = useTaskComplianceByUser(sprintId);
+  const { data: precisionByUser, loading: precisionLoading } =
+    usePrecisionEstimationByUser(sprintId);
+  const { kpisForCards } = useKpiCardValues({
+    kpis,
+    precisionByUser,
+    precisionLoading,
+    complianceByUser,
+  });
 
   if (contextLoading || loading) {
     return (
@@ -49,7 +61,7 @@ export default function Dashboard() {
 
         {/*KPIS*/}
         <div className={styles.kpiGrid}>
-          {kpis.map(({ key: kpiKey, ...kpiProps }) => (
+          {kpisForCards.map(({ key: kpiKey, ...kpiProps }) => (
             <KpiCard key={kpiKey} {...kpiProps} />
           ))}
         </div>
