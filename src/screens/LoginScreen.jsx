@@ -2,8 +2,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import authService from "../services/authService";
 import styles from "../styles/screens/LoginScreen.module.css";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 
 const LoginScreen = () => {
   const { login } = useAuth();
@@ -12,6 +13,7 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,21 +21,23 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
-      // Aquí irá la llamada al endpoint del backend
-      // Por ahora simulamos un delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      // Validación básica temporal
       if (!email || !password) {
         setError("Por favor completa todos los campos");
         setLoading(false);
         return;
       }
 
+      const token = await authService.login(email, password);
+
+      try {
+        localStorage.setItem("token", token);
+      } catch (e) {
+      }
+
       login();
       navigate("/dashboard");
     } catch (err) {
-      setError("Error al iniciar sesión. Intenta de nuevo.");
+      setError(err?.message || "Error al iniciar sesión. Intenta de nuevo.");
       setLoading(false);
     }
   };
@@ -82,13 +86,25 @@ const LoginScreen = () => {
               <Lock size={18} className={styles.inputIcon} />
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.input}
                 disabled={loading}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className={styles.passwordToggle}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? (
+                  <EyeOff size={18} className={styles.toggleIcon} />
+                ) : (
+                  <Eye size={18} className={styles.toggleIcon} />
+                )}
+              </button>
             </div>
           </div>
 
@@ -105,10 +121,7 @@ const LoginScreen = () => {
           </button>
         </form>
 
-        {/* Pie de Página */}
-        <p className={styles.footer}>
-          Demostración: Usa cualquier correo y contraseña para continuar
-        </p>
+        {/* Pie de Página (removido) */}
       </div>
     </div>
   );

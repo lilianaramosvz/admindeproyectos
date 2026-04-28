@@ -119,7 +119,7 @@
 
 .input {
   width: 100%;
-  padding: 12px 12px 12px 44px;
+  padding: 12px 44px 12px 44px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   border-radius: 8px;
@@ -150,7 +150,32 @@
   cursor: not-allowed;
 }
 
-/* Error Message */
+.passwordToggle {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--text-tertiary);
+}
+
+.passwordToggle:focus {
+  outline: none;
+}
+
+.passwordToggle:hover {
+  color: var(--blue);
+}
+
+.toggleIcon {
+  position: static;
+  color: inherit;
+}
+
 .errorMessage {
   padding: 12px;
   background: rgba(239, 68, 68, 0.1);
