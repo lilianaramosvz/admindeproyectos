@@ -53,7 +53,7 @@ const LoginScreen = () => {
         {/* Encabezado */}
         <div className={styles.header}>
           <h1 className={styles.title}>Bienvenido</h1>
-          <p className={styles.subtitle}>Inicia sesión en tu dashboard</p>
+          <p className={styles.subtitle}>Inicia sesión en tu administrador de tareas</p>
         </div>
 
         {/* Formulario */}
