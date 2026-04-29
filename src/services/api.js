@@ -1,10 +1,25 @@
 //frontend\src\services\api.js
-const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.DEV ? "" : "https://sammy-ulfh.dev");
+const BASE_URL = "https://sammy-ulfh.dev";
+
+function getHeaders(additional = {}) {
+  const headers = {
+    "Content-Type": "application/json",
+    ...additional,
+  };
+
+  try {
+    const token = localStorage.getItem("token");
+    if (token) headers.Authorization = `Bearer ${token}`;
+  } catch (e) {
+  }
+
+  return headers;
+}
 
 async function getJson(path) {
-  const res = await fetch(`${BASE_URL}${path}`);
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: getHeaders(),
+  });
 
   if (!res.ok) {
     throw new Error(`Error ${res.status} al consultar ${path}`);
@@ -14,7 +29,9 @@ async function getJson(path) {
 }
 
 async function getJsonOrNull(path) {
-  const res = await fetch(`${BASE_URL}${path}`);
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: getHeaders(),
+  });
 
   if (res.status === 404) {
     return null;
