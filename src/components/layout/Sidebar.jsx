@@ -11,7 +11,7 @@ const navItems = [
   { label: "Tareas", to: "/tareas" },
   { label: "KPI's", to: "/kpis" },
   { label: "Asistencia IA", to: "/asistencia-ia" },
-  { label: "Ajustes", to: "/ajustes" },
+  { label: "Información", to: "/ajustes" },
 ];
 
 export default function Sidebar() {

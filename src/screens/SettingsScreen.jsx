@@ -29,11 +29,11 @@ export default function SettingsScreen() {
   ];
 
   return (
-    <MainLayout title="Ajustes">
+    <MainLayout title="Información de la cuenta">
       <div className={styles.container}>
         {/* HEADER */}
         <div className={styles.header}>
-          <h1 className={styles.title}>Ajustes</h1>
+          <h1 className={styles.title}>Información de la cuenta</h1>
           <p className={styles.headerDescription}>
             Información de tu cuenta registrada en el sistema.
           </p>
