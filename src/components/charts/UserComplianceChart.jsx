@@ -114,19 +114,32 @@ export default function UserComplianceChart({ data = [], color = "orange" }) {
     );
   }
 
-  const longestLabel = data.reduce((max, item) => {
+  // Filter out "Admin Sistema" user
+  const filteredData = data.filter(
+    (item) => item?.label?.trim() !== "Admin Sistema"
+  );
+
+  if (filteredData.length === 0) {
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateText}>Sin datos por usuario</p>
+      </div>
+    );
+  }
+
+  const longestLabel = filteredData.reduce((max, item) => {
     return Math.max(max, String(item?.label ?? "").trim().length);
   }, 0);
 
   const rightMargin = 90;
   const yAxisWidth = Math.min(240, Math.max(160, longestLabel * 7));
-  const dynamicHeight = Math.max(180, data.length * 48);
+  const dynamicHeight = Math.max(180, filteredData.length * 48);
 
   return (
     <div className={styles.root} style={{ height: `${dynamicHeight}px` }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={data}
+          data={filteredData}
           layout="vertical"
           margin={{ top: 8, right: rightMargin, bottom: 20, left: 20 }}
           barCategoryGap={12}

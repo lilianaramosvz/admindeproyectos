@@ -8,7 +8,7 @@ function getHeaders(additional = {}) {
   };
 
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     if (token) headers.Authorization = `Bearer ${token}`;
   } catch (e) {
   }

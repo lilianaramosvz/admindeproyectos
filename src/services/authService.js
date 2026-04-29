@@ -22,11 +22,16 @@ export async function login(correo, password) {
     console.log("Response data:", data);
 
     if (!response.ok) {
-      const message = data?.message || data?.error || `Error ${response.status}`;
+      const message =
+        data?.message || data?.error || `Error ${response.status}`;
       throw new Error(message);
     }
 
-    const token = data?.token || data?.accessToken || data?.access_token || data?.data?.token;
+    const token =
+      data?.token ||
+      data?.accessToken ||
+      data?.access_token ||
+      data?.data?.token;
     if (!token) throw new Error("Respuesta inválida: falta token");
 
     return token;
@@ -60,7 +65,7 @@ export async function register(payload) {
 
 export async function validateToken() {
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("authToken");
     if (!token) return false;
 
     const res = await fetch(`${BASE_URL}/api/v1/auth/validate`, {
