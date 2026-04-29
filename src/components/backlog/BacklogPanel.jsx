@@ -1,6 +1,6 @@
 //frontend\src\components\backlog\BacklogPanel.jsx
 import { useMemo, useState } from "react";
-import styles from "../../styles/screens/BacklogTable.module.css";
+import styles from "../../styles/components/backlog/BacklogTable.module.css";
 import Avatar from "../ui/Avatar";
 import Complexity from "../ui/Complexity";
 import Badge from "../ui/Badge";

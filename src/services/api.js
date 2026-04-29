@@ -42,7 +42,9 @@ export function getSprintCompliance(userId, sprintId) {
 }
 
 export function getSprintDuration(userId, sprintId) {
-  return getJsonOrNull(`/api/kpis/usuario/${userId}/sprint/${sprintId}/duracion`);
+  return getJsonOrNull(
+    `/api/kpis/usuario/${userId}/sprint/${sprintId}/duracion`,
+  );
 }
 
 export function getProjectCycleTime(userId, projectId) {
@@ -67,4 +69,33 @@ export function getActiveProjects() {
 
 export function getActiveSprints() {
   return getJson(`/api/kpis/sprints/activos`);
+}
+
+async function postJson(path, body, token = null) {
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || `Error ${res.status}`);
+  }
+
+  return res.json();
+}
+
+export function loginUser(correo, password) {
+  return postJson("/api/v1/auth/login", { correo, password });
+}
+
+export function validateToken(token) {
+  return fetch(`${BASE_URL}/api/v1/auth/validate`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => (res.ok ? res.json() : Promise.reject()));
 }

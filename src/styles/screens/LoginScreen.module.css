@@ -119,7 +119,7 @@
 
 .input {
   width: 100%;
-  padding: 12px 12px 12px 44px;
+  padding: 12px 44px 12px 44px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   border-radius: 8px;
@@ -230,4 +230,30 @@
   .input {
     font-size: 16px; /* Prevent zoom on iOS */
   }
+}
+
+/* Toggle Password Button */
+.togglePasswordButton {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.togglePasswordButton:hover:not(:disabled) {
+  color: var(--blue);
+  background: rgba(108, 162, 248, 0.1);
+}
+
+.togglePasswordButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

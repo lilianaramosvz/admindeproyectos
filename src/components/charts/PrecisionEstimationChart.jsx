@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import styles from "../../styles/components/dashboard/PrecisionEstimationChart.module.css";
+import styles from "../../styles/components/charts/PrecisionEstimationChart.module.css";
 
 const COLOR_MAP = {
   blue: "var(--blue)",
