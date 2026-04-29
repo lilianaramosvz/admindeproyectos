@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import styles from "../../styles/components/dashboard/SprintDurationChart.module.css";
+import styles from "../../styles/components/charts/SprintDurationChart.module.css";
 
 const COLOR_MAP = {
   blue: "var(--blue)",

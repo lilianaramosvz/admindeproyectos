@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import styles from "../../styles/components/dashboard/UserComplianceChart.module.css";
+import styles from "../../styles/components/charts/UserComplianceChart.module.css";
 
 const MAX_PERCENT = 100;
 

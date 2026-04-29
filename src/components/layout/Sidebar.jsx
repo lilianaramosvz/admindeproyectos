@@ -16,7 +16,16 @@ const navItems = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
+  const initials = user
+    ? `${user.nombre?.[0] ?? ""}${user.apellido?.[0] ?? ""}`.toUpperCase()
+    : "??";
+
+  // Mostrar solo el primer nombre y el primer apellido
+  const fullName = user
+    ? `${user.nombre?.split(" ")?.[0] ?? ""} ${user.apellido?.split(" ")?.[0] ?? ""}`.trim()
+    : "Usuario";
 
   const handleLogout = () => {
     logout();
@@ -51,12 +60,11 @@ export default function Sidebar() {
       <div className={styles.profileSection}>
         <hr className={styles.separator} />
         <div className={styles.profileRow}>
-          <div className={styles.avatar}>LR</div>
+          <div className={styles.avatar}>{initials}</div>
           <div className={styles.userInfo}>
             <div className={styles.userText}>
-              {/* Ejemplo para el display, esto se deberá cambiar a los valores reales del usuario */}
-              <span className={styles.name}>Lili Ramos</span>
-              <span className={styles.email}>lili.ramos@example.com</span>
+              <span className={styles.name}>{fullName}</span>
+              <span className={styles.email}>{user?.correo ?? ""}</span>
             </div>
             <button
               type="button"

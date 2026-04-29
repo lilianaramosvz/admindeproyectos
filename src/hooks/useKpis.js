@@ -64,7 +64,7 @@ const KPI_DEFINITIONS = [
   },
   {
     key: "cycleTime",
-    title: "Tareas por usuario",
+    title: "Tareas por equipo",
     historyType: "TIEMPO_CICLO",
     color: "green",
     scope: "project",
@@ -463,12 +463,12 @@ const extractEstimationComparison = (snapshot) => {
     "descripcion",
     "status",
   ]);
-  const mentionsOverestimation = /sobreestima|sobreestimo|termina\s+antes/i.test(
-    String(statusText ?? ""),
-  );
-  const mentionsUnderestimation = /subestima|subestimo|termina\s+despues|termina\s+después/i.test(
-    String(statusText ?? ""),
-  );
+  const mentionsOverestimation =
+    /sobreestima|sobreestimo|termina\s+antes/i.test(String(statusText ?? ""));
+  const mentionsUnderestimation =
+    /subestima|subestimo|termina\s+despues|termina\s+después/i.test(
+      String(statusText ?? ""),
+    );
 
   const estimatedRaw = selectValueFromObject(snapshot, [
     "actualValue",
@@ -588,7 +588,6 @@ const extractDurationComparison = (snapshot) => {
     return null;
   }
 
-  // Backend format: "58.0 / 63.0 hrs" => real / planificado
   const pairMatch = details.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
   if (!pairMatch) {
     return null;
@@ -652,7 +651,6 @@ const extractCycleTimeComparison = (snapshot) => {
     return null;
   }
 
-  // Backend format: "8.6 / 8.7 hrs" => actual / expected
   const pairMatch = details.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
   if (!pairMatch) {
     return null;

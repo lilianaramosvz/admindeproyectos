@@ -1,40 +1,31 @@
 //frontend\src\screens\SettingsScreen.jsx
-import { useState } from "react";
 import MainLayout from "../components/layout/MainLayout";
+import { useAuth } from "../context/AuthContext";
 import styles from "../styles/screens/SettingsScreen.module.css";
 
 export default function SettingsScreen() {
-  const [user, setUser] = useState({
-    email: "lili.ramos@example.com",
-    role: "Senior Developer",
-    team: "Equipo 44",
-  });
+  const { user } = useAuth();
 
-  const [editField, setEditField] = useState(null);
-  const [tempValue, setTempValue] = useState("");
-
-  const handleEdit = (field) => {
-    setEditField(field);
-    setTempValue(user[field]);
-  };
-
-  const handleSave = () => {
-    setUser((prev) => ({
-      ...prev,
-      [editField]: tempValue,
-    }));
-    setEditField(null);
-  };
-
-  const handleCancel = () => {
-    setEditField(null);
-    setTempValue("");
-  };
+  if (!user) return null;
 
   const fields = [
-    { key: "email", label: "Correo", editable: false },
-    { key: "role", label: "Rol", editable: true },
-    { key: "team", label: "Equipo", editable: true },
+    {
+      label: "Nombre completo",
+      value: `${user.nombre ?? ""} ${user.apellido ?? ""}`.trim(),
+    },
+    {
+      label: "Correo electrónico",
+      value: user.correo ?? "—",
+    },
+
+    {
+      label: "ID de equipo",
+      value: user.idEquipo ? `Equipo ${user.idEquipo}` : "—",
+    },
+    {
+      label: "ID de usuario",
+      value: user.idUsuario ?? "—",
+    },
   ];
 
   return (
@@ -43,7 +34,9 @@ export default function SettingsScreen() {
         {/* HEADER */}
         <div className={styles.header}>
           <h1 className={styles.title}>Ajustes</h1>
-          <p className={styles.headerDescription}>Maneja y administra tu cuenta.</p>
+          <p className={styles.headerDescription}>
+            Información de tu cuenta registrada en el sistema.
+          </p>
         </div>
 
         <div className={styles.card}>
@@ -51,42 +44,18 @@ export default function SettingsScreen() {
 
           {fields.map((field, index) => (
             <div
-              key={field.key}
-              className={`${styles.item} ${index < fields.length - 1 ? styles.withDivider : ""}`}
+              key={field.label}
+              className={`${styles.item} ${
+                index < fields.length - 1 ? styles.withDivider : ""
+              }`}
             >
               <div className={styles.block}>
                 <div className={styles.row}>
                   <div>
                     <p className={styles.label}>{field.label}</p>
-                    <p className={styles.value}>{user[field.key]}</p>
+                    <p className={styles.value}>{field.value}</p>
                   </div>
-
-                  <button
-                    className={`${styles.edit} ${!field.editable ? styles.editHidden : ""}`}
-                    onClick={() => handleEdit(field.key)}
-                  >
-                    Editar
-                  </button>
                 </div>
-
-                {editField === field.key && (
-                  <div className={styles.dropdown}>
-                    <input
-                      className={styles.inputInline}
-                      value={tempValue}
-                      onChange={(e) => setTempValue(e.target.value)}
-                    />
-
-                    <div className={styles.actions}>
-                      <button className={styles.save} onClick={handleSave}>
-                        Guardar
-                      </button>
-                      <button className={styles.cancel} onClick={handleCancel}>
-                        Cancelar
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           ))}

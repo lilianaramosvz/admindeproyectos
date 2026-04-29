@@ -210,13 +210,6 @@ export default function KPIScreen() {
           ))}
         </div>
 
-        {/* SECONDARY KPIs 
-        <div className={styles.kpiGrid}>
-          {secondaryKpis.map((kpi) => (
-            <KpiCard key={kpi.title} {...kpi} />
-          ))}
-        </div>*/}
-
         {/* charts */}
         <div className={styles.charts}>
           {kpis.map((kpi) => (
@@ -247,12 +240,12 @@ export default function KPIScreen() {
                   }`}
                 >
                   {kpi.key === "cycleTime"
-                    ? `${totalCompletedTasks.toFixed(0)} tareas`
+                    ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
                     : kpi.key === "precision"
                       ? precisionLoading
                         ? "..."
                         : (precisionValueFromChart ?? "Sin datos")
-                    : kpi.value}
+                      : kpi.value}
                 </span>
               </div>
               {kpi.key === "compliance" ? (

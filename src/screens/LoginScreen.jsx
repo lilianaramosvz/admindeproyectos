@@ -2,14 +2,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import authService from "../services/authService";
+import { loginUser } from "../services/api";
 import styles from "../styles/screens/LoginScreen.module.css";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 
 const LoginScreen = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [correo, setCorreo] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -18,26 +18,27 @@ const LoginScreen = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!correo || !password) {
+      setError("Por favor completa todos los campos");
+      return;
+    }
+
     setLoading(true);
-
     try {
-      if (!email || !password) {
-        setError("Por favor completa todos los campos");
-        setLoading(false);
-        return;
-      }
-
-      const token = await authService.login(email, password);
-
-      try {
-        localStorage.setItem("token", token);
-      } catch (e) {
-      }
-
-      login();
+      const data = await loginUser(correo, password);
+      login(data.token, {
+        correo: data.correo,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        idUsuario: data.idUsuario,
+        idRol: data.idRol,
+        idEquipo: data.idEquipo,
+      });
       navigate("/dashboard");
     } catch (err) {
-      setError(err?.message || "Error al iniciar sesión. Intenta de nuevo.");
+      setError(err.message || "Credenciales incorrectas. Intenta de nuevo.");
+    } finally {
       setLoading(false);
     }
   };
@@ -45,7 +46,6 @@ const LoginScreen = () => {
   return (
     <div className={styles.loginContainer}>
       <div className={styles.card}>
-        {/* Ícono de Candado */}
         <div className={styles.iconContainer}>
           <Lock size={32} />
         </div>
@@ -53,31 +53,31 @@ const LoginScreen = () => {
         {/* Encabezado */}
         <div className={styles.header}>
           <h1 className={styles.title}>Bienvenido</h1>
-          <p className={styles.subtitle}>Inicia sesión en tu dashboard</p>
+          <p className={styles.subtitle}>Inicia sesión en tu administrador de tareas</p>
         </div>
 
         {/* Formulario */}
         <form onSubmit={handleLogin} className={styles.form}>
-          {/* Input de Email */}
+          {/* Correo */}
           <div className={styles.inputGroup}>
-            <label htmlFor="email" className={styles.label}>
+            <label htmlFor="correo" className={styles.label}>
               Correo Electrónico
             </label>
             <div className={styles.inputWrapper}>
               <Mail size={18} className={styles.inputIcon} />
               <input
-                id="email"
+                id="correo"
                 type="email"
                 placeholder="tu@correo.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={correo}
+                onChange={(e) => setCorreo(e.target.value)}
                 className={styles.input}
                 disabled={loading}
               />
             </div>
           </div>
 
-          {/* Input de Contraseña */}
+          {/* Contraseña */}
           <div className={styles.inputGroup}>
             <label htmlFor="password" className={styles.label}>
               Contraseña
@@ -95,15 +95,17 @@ const LoginScreen = () => {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className={styles.passwordToggle}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                className={styles.togglePasswordButton}
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={loading}
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
+                title={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
               >
-                {showPassword ? (
-                  <EyeOff size={18} className={styles.toggleIcon} />
-                ) : (
-                  <Eye size={18} className={styles.toggleIcon} />
-                )}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
@@ -120,8 +122,6 @@ const LoginScreen = () => {
             {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
           </button>
         </form>
-
-        {/* Pie de Página (removido) */}
       </div>
     </div>
   );
