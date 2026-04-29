@@ -137,9 +137,7 @@ export default function KPIScreen() {
             desempeño y progreso.
           </p>
           <p className={styles.contextMeta}>
-            <span>
-              Usuario: {userName} | Proyecto: {projectName}
-            </span>
+            <span>Proyecto: {projectName}</span>
             <span className={styles.sprintPicker} ref={sprintDropdownRef}>
               <button
                 type="button"

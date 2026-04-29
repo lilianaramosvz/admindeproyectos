@@ -6,11 +6,13 @@ import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
+import { useAuth } from "../context/AuthContext";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
 import styles from "../styles/screens/Dashboard.module.css";
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const {
     userId,
     projectId,
@@ -21,6 +23,9 @@ export default function Dashboard() {
     loading: contextLoading,
     error: contextError,
   } = useKpiContext();
+
+  // Equipo del usuario
+  const teamName = user?.idEquipo ?? "Equipo";
   const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
   const { data: complianceByUser } = useTaskComplianceByUser(sprintId);
   const { data: precisionByUser, loading: precisionLoading } =
@@ -35,7 +40,7 @@ export default function Dashboard() {
   if (contextLoading || loading) {
     return (
       <MainLayout title="Dashboard">
-        <div className={styles.container}>Cargando KPIs...</div>
+        <div className={styles.container}>Cargando...</div>
       </MainLayout>
     );
   }
@@ -50,7 +55,7 @@ export default function Dashboard() {
             ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
           </p>
           <p className={styles.contextMeta}>
-            Usuario: {userName} | Proyecto: {projectName} | Sprint: {sprintName}
+            Equipo: {teamName} | Sprint: {sprintName}
           </p>
         </div>
 
