@@ -3,11 +3,15 @@ import { useMemo } from "react";
 
 export function useKpiCardValues({
   kpis,
-  precisionByUser,
+  precisionByUser = [],
   precisionLoading,
-  complianceByUser,
+  complianceByUser = [],
 }) {
   const precisionValueFromChart = useMemo(() => {
+    if (!precisionByUser || precisionByUser.length === 0) {
+      return null;
+    }
+
     const validPrecisions = precisionByUser
       .map((item) => Number(item?.precision))
       .filter((value) => Number.isFinite(value));
@@ -24,6 +28,10 @@ export function useKpiCardValues({
   }, [precisionByUser]);
 
   const totalCompletedTasks = useMemo(() => {
+    if (!complianceByUser || complianceByUser.length === 0) {
+      return 0;
+    }
+    
     return complianceByUser.reduce((acc, item) => {
       const completed = Number(item?.completed);
       return Number.isFinite(completed) ? acc + completed : acc;
@@ -31,26 +39,23 @@ export function useKpiCardValues({
   }, [complianceByUser]);
 
   const kpisForCards = useMemo(() => {
-    return kpis.map((kpi) => {
-      if (kpi.key === "precision") {
-        return {
-          ...kpi,
-          value: precisionLoading
-            ? "..."
-            : (precisionValueFromChart ?? "Sin datos"),
-        };
-      }
+    if (!kpis || kpis.length === 0) {
+      return [];
+    }
 
-      if (kpi.key === "cycleTime") {
-        return {
-          ...kpi,
-          value: `${totalCompletedTasks.toFixed(0)} tareas`,
-        };
-      }
+    return kpis
+      .filter((kpi) => kpi.key !== "precision")
+      .map((kpi) => {
+        if (kpi.key === "cycleTime") {
+          return {
+            ...kpi,
+            value: `${totalCompletedTasks.toFixed(0)} tareas`,
+          };
+        }
 
-      return kpi;
-    });
-  }, [kpis, precisionLoading, precisionValueFromChart, totalCompletedTasks]);
+        return kpi;
+      });
+  }, [kpis, totalCompletedTasks]);
 
   return {
     kpisForCards,

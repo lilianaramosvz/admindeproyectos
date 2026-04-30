@@ -1,4 +1,3 @@
-//frontend\src\hooks\useKpis.js
 import { useEffect, useState } from "react";
 import {
   getProjectCycleTime,
@@ -9,6 +8,88 @@ import {
 } from "../services/api";
 
 const KPI_DEFINITIONS = [
+  {
+    key: "cycleTime",
+    title: "Tareas por equipo",
+    historyType: "TIEMPO_CICLO",
+    color: "green",
+    scope: "project",
+    unit: "%",
+    aliases: ["tiempo-ciclo", "tiempociclo", "cycletime", "tiempo de ciclo"],
+    valueFields: [
+      "productivityPercentage",
+      "tiempoCiclo",
+      "cycleTime",
+      "valor",
+      "value",
+      "average",
+      "promedio",
+    ],
+    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
+    fetcher: getProjectCycleTime,
+  },
+  {
+    key: "realHours",
+    title: "Horas reales por usuario",
+    historyType: "HORAS_REALES",
+    color: "purple",
+    scope: "sprint",
+    unit: "hrs",
+    aliases: ["horas reales", "realhours", "horasreales", "real hours", "horas trabajadas"],
+    valueFields: [
+      "actualValue",
+      "realHours",
+      "horasReales",
+      "valor",
+      "value",
+      "average",
+      "promedio",
+    ],
+    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
+    fetcher: getSprintDuration,
+  },
+  {
+    key: "duration",
+    title: "Duración del sprint",
+    historyType: "DURACION_SPRINT",
+    color: "blue",
+    scope: "sprint",
+    unit: "%",
+    aliases: ["duracion", "duration", "sprintduration", "sprint duración"],
+    valueFields: [
+      "efficiencyPercentage",
+      "efficiencypercentage",
+      "duracion",
+      "duration",
+      "valor",
+      "value",
+      "average",
+      "promedio",
+    ],
+    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
+    fetcher: getSprintDuration,
+  },
+  {
+    key: "compliance",
+    title: "Cumplimiento de tareas",
+    historyType: "CUMPLIMIENTO_SPRINT",
+    color: "orange",
+    scope: "sprint",
+    unit: "%",
+    aliases: ["cumplimiento", "sprintcompliance", "compliance"],
+    valueFields: [
+      "productivityPercentage",
+      "compliancePercentage",
+      "cumplimiento",
+      "percentage",
+      "valor",
+      "value",
+      "average",
+      "promedio",
+    ],
+    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
+    fetcher: getSprintCompliance,
+  },
   {
     key: "precision",
     title: "Precisión de estimación de carga",
@@ -40,68 +121,6 @@ const KPI_DEFINITIONS = [
     ],
     statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
     fetcher: getUserPrecisionEstimation,
-  },
-  {
-    key: "compliance",
-    title: "Cumplimiento de tareas",
-    historyType: "CUMPLIMIENTO_SPRINT",
-    color: "orange",
-    scope: "sprint",
-    unit: "%",
-    aliases: ["cumplimiento", "sprintcompliance", "compliance"],
-    valueFields: [
-      "productivityPercentage",
-      "compliancePercentage",
-      "cumplimiento",
-      "percentage",
-      "valor",
-      "value",
-      "average",
-      "promedio",
-    ],
-    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
-    fetcher: getSprintCompliance,
-  },
-  {
-    key: "cycleTime",
-    title: "Tareas por equipo",
-    historyType: "TIEMPO_CICLO",
-    color: "green",
-    scope: "project",
-    unit: "%",
-    aliases: ["tiempo-ciclo", "tiempociclo", "cycletime", "tiempo de ciclo"],
-    valueFields: [
-      "productivityPercentage",
-      "tiempoCiclo",
-      "cycleTime",
-      "valor",
-      "value",
-      "average",
-      "promedio",
-    ],
-    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
-    fetcher: getProjectCycleTime,
-  },
-  {
-    key: "duration",
-    title: "Duración del sprint",
-    historyType: "DURACION_SPRINT",
-    color: "blue",
-    scope: "sprint",
-    unit: "%",
-    aliases: ["duracion", "duration", "sprintduration", "sprint duración"],
-    valueFields: [
-      "efficiencyPercentage",
-      "efficiencypercentage",
-      "duracion",
-      "duration",
-      "valor",
-      "value",
-      "average",
-      "promedio",
-    ],
-    statusFields: ["statusMessage", "message", "mensaje", "descripcion"],
-    fetcher: getSprintDuration,
   },
 ];
 
@@ -351,7 +370,6 @@ const buildChartData = (historyItems, metric, snapshot) => {
     })
     .filter(Boolean);
 
-  // Agrupar por día y promediar valores del mismo día
   const aggregatedHistory = aggregateByDay(normalizedHistory);
 
   if (aggregatedHistory.length > 0) {
@@ -779,16 +797,8 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
 
           const durationChartData = durationComparison
             ? [
-                {
-                  value: durationComparison.real,
-                  label: "Tiempo real",
-                  date: null,
-                },
-                {
-                  value: durationComparison.planned,
-                  label: "Tiempo planificado",
-                  date: null,
-                },
+                { value: durationComparison.real, label: "Tiempo real", date: null },
+                { value: durationComparison.planned, label: "Tiempo planificado", date: null },
               ]
             : null;
 
@@ -798,55 +808,27 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
 
           const cycleTimeChartData = cycleTimeComparison
             ? [
-                {
-                  value: cycleTimeComparison.expected,
-                  label: "Tiempo esperado",
-                  date: null,
-                },
-                {
-                  value: cycleTimeComparison.actual,
-                  label: "Tiempo real",
-                  date: null,
-                },
+                { value: cycleTimeComparison.expected, label: "Tiempo esperado", date: null },
+                { value: cycleTimeComparison.actual, label: "Tiempo real", date: null },
               ]
             : null;
 
           const displayValue =
             metric.key === "duration" && durationComparison
               ? (() => {
-                  const durationPercent = normalizeMetricValue(currentValue, {
-                    ...metric,
-                    unit: "%",
-                  });
-
-                  if (durationPercent === null) {
-                    return "Sin datos";
-                  }
-
+                  const durationPercent = normalizeMetricValue(currentValue, { ...metric, unit: "%" });
+                  if (durationPercent === null) return "Sin datos";
                   return `${durationPercent.toFixed(2)}%`;
                 })()
               : metric.key === "cycleTime"
                 ? (() => {
-                    const cyclePercent = normalizeMetricValue(currentValue, {
-                      ...metric,
-                      unit: "%",
-                    });
-
-                    if (cyclePercent === null) {
-                      return "Sin datos";
-                    }
-
+                    const cyclePercent = normalizeMetricValue(currentValue, { ...metric, unit: "%" });
+                    if (cyclePercent === null) return "Sin datos";
                     return `${cyclePercent.toFixed(1)}%`;
                   })()
                 : formatMetricValue(currentValue, metric);
 
-          const displaySubtitle =
-            metric.key === "duration" && durationRatio !== null
-              ? undefined
-              : undefined;
-
-          const displayChartData =
-            durationChartData ?? cycleTimeChartData ?? chartData;
+          const displayChartData = durationChartData ?? cycleTimeChartData ?? chartData;
           const displayUnit =
             metric.key === "duration" && durationComparison
               ? durationComparison.unit
@@ -854,9 +836,7 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
                 ? cycleTimeComparison.unit
                 : metric.unit;
           const displayHasHistory =
-            durationChartData || cycleTimeChartData
-              ? false
-              : chartMeta.hasHistory;
+            durationChartData || cycleTimeChartData ? false : chartMeta.hasHistory;
 
           return {
             key: metric.key,
@@ -868,7 +848,7 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
             chartData: displayChartData,
             unit: displayUnit,
             hasHistory: displayHasHistory,
-            subtitle: displaySubtitle,
+            subtitle: undefined,
             estimationComparison,
             durationComparison,
             cycleTimeComparison,
@@ -878,9 +858,7 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
         setKpis(mapped);
 
         if (resolvedMetrics.some((result) => result?.status === "rejected")) {
-          console.warn(
-            "No se pudieron cargar todos los KPI. Se muestran los datos disponibles.",
-          );
+          console.warn("No se pudieron cargar todos los KPI. Se muestran los datos disponibles.");
         }
       } catch (err) {
         console.error(err);

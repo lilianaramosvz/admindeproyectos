@@ -5,7 +5,6 @@ import { useKpis } from "../hooks/useKpis";
 import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
-import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import { useAuth } from "../context/AuthContext";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
@@ -27,12 +26,8 @@ export default function Dashboard() {
   const teamName = user?.idEquipo ?? "Equipo";
   const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
   const { data: complianceByUser } = useTaskComplianceByUser(sprintId);
-  const { data: precisionByUser, loading: precisionLoading } =
-    usePrecisionEstimationByUser(sprintId);
   const { kpisForCards } = useKpiCardValues({
     kpis,
-    precisionByUser,
-    precisionLoading,
     complianceByUser,
   });
 

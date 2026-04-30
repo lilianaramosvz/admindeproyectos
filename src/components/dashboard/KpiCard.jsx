@@ -12,9 +12,7 @@ export default function KpiCard({
 }) {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const colorClass = styles[color] || "";
-  const hasStatusMessage = Boolean(
-    statusMessage && String(statusMessage).trim(),
-  );
+  const infoText = String(statusMessage ?? "").trim() || String(change ?? "").trim() || "Sin detalles";
 
   return (
     <div className={`${styles.card} ${colorClass}`}>
@@ -22,17 +20,15 @@ export default function KpiCard({
         <div className={styles.icon}></div>
         <div className={styles.actions}>
           <span className={styles.badge}>{change}</span>
-          {hasStatusMessage ? (
-            <button
-              type="button"
-              className={styles.infoButton}
-              onClick={() => setIsInfoOpen((open) => !open)}
-              aria-expanded={isInfoOpen}
-              aria-label={`Mostrar mas informacion de ${title}`}
-            >
-              {isInfoOpen ? "-" : "+"}
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className={styles.infoButton}
+            onClick={() => setIsInfoOpen((open) => !open)}
+            aria-expanded={isInfoOpen}
+            aria-label={`Mostrar mas informacion de ${title}`}
+          >
+            {isInfoOpen ? "-" : "+"}
+          </button>
         </div>
       </div>
 
@@ -41,8 +37,8 @@ export default function KpiCard({
 
       {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
 
-      {hasStatusMessage && isInfoOpen ? (
-        <div className={styles.infoPanel}>{statusMessage}</div>
+      {isInfoOpen ? (
+        <div className={styles.infoPanel}>{infoText}</div>
       ) : null}
     </div>
   );

@@ -14,13 +14,25 @@ const toNumberOrNull = (value) => {
 const getLatestSprint = (sprints) => {
   if (!Array.isArray(sprints) || sprints.length === 0) return null;
 
+  // Buscar Sprint 2 por defecto
+  const sprint2 = sprints.find(
+    (sprint) => sprint?.nombre === "Sprint 2" || sprint?.nombre === "sprint 2"
+  );
+  if (sprint2) return sprint2;
+
+  // Si no existe Sprint 2, retornar el sprint con menor ID
   return [...sprints].sort((left, right) => {
     const leftId = Number(left?.id);
     const rightId = Number(right?.id);
 
+    // Both must be valid finite numbers (including 0)
     if (Number.isFinite(leftId) && Number.isFinite(rightId)) {
-      return rightId - leftId;
+      return leftId - rightId;
     }
+
+    // If one is valid and the other isn't, prefer the valid one
+    if (Number.isFinite(rightId)) return 1;
+    if (Number.isFinite(leftId)) return -1;
 
     return 0;
   })[0];
@@ -68,7 +80,7 @@ export function useKpiContext() {
         const selectedSprintId =
           toNumberOrNull(import.meta.env.VITE_KPI_SPRINT_ID) ??
           latestSprint?.id ??
-          selectedProjectId;
+          null;
 
         const selectedUser = users?.find((item) => item.id === selectedUserId);
         const selectedProject = projects?.find(

@@ -8,8 +8,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from 'recharts';
-import { useSprintDurationByUser } from '../../hooks/useSprintDurationByUser';
-import styles from '../../styles/components/charts/SprintDurationChart.module.css';
+import { useRealHoursByUser } from '../../hooks/useRealHoursByUser';
+import styles from '../../styles/components/charts/RealHoursByUser.module.css';
 
 const COLOR_MAP = {
   blue: "var(--blue)",
@@ -20,17 +20,6 @@ const COLOR_MAP = {
   darkblue: "var(--darkblue)",
   pink: "var(--pink)",
   aqua: "var(--aqua)",
-};
-
-const SOFT_COLOR_MAP = {
-  blue: "var(--blue-chart-soft)",
-  green: "var(--green-chart-soft)",
-  purple: "var(--purple-chart-soft)",
-  orange: "var(--orange-chart-soft)",
-  yellow: "var(--yellow-chart-soft)",
-  darkblue: "var(--darkblue-chart-soft)",
-  pink: "var(--pink-chart-soft)",
-  aqua: "var(--aqua-chart-soft)",
 };
 
 function formatHours(value, unit = "hrs") {
@@ -54,60 +43,29 @@ function AxisTick({ x, y, payload }) {
   );
 }
 
-function getDeltaInfo(plannedHours, realHours) {
-  const planned = Number(plannedHours);
-  const real = Number(realHours);
-
-  if (!Number.isFinite(planned) || !Number.isFinite(real)) {
-    return { delta: 0, label: "Sin comparación" };
-  }
-
-  const delta = real - planned;
-  if (Math.abs(delta) < 0.01) {
-    return { delta, label: "Duración exacta" };
-  }
-
-  return delta > 0
-    ? { delta, label: "Se tardó más" }
-    : { delta, label: "Se tardó menos" };
-}
-
-function DurationTooltip({ active, payload }) {
+function RealHoursTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null;
 
   const point = payload[0]?.payload;
   if (!point) return null;
 
-  const plannedValue = payload.find(
-    (item) => item.dataKey === "plannedHours",
-  );
   const realValue = payload.find((item) => item.dataKey === "realHours");
   const unit = point.unit || "hrs";
-  const deltaInfo = getDeltaInfo(point.plannedHours, point.realHours);
 
   return (
     <div className={styles.tooltip}>
       <div className={styles.tooltipLabel}>{point.label}</div>
       <div className={styles.tooltipValue}>
-        Planificadas: {formatHours(plannedValue?.value, unit)}
-      </div>
-      <div className={styles.tooltipValue}>
-        Reales: {formatHours(realValue?.value, unit)}
-      </div>
-      <div className={styles.tooltipMeta}>
-        {deltaInfo.label}: {formatHours(Math.abs(deltaInfo.delta), unit)}
+        Horas reales: {formatHours(realValue?.value, unit)}
       </div>
     </div>
   );
 }
 
-const SprintDurationChart = ({ sprintId, color = "blue" }) => {
-  const { data: apiData, loading, error } = useSprintDurationByUser(
-    sprintId !== null && sprintId !== undefined ? sprintId : null
-  );
+const RealHoursByUser = ({ sprintId, color = "green" }) => {
+  const { data: apiData, loading, error } = useRealHoursByUser(sprintId);
 
-  const primaryColor = COLOR_MAP[color] || COLOR_MAP.blue;
-  const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.blue;
+  const primaryColor = COLOR_MAP[color] || COLOR_MAP.green;
 
   if (loading) {
     return (
@@ -134,36 +92,17 @@ const SprintDurationChart = ({ sprintId, color = "blue" }) => {
   }
 
   const chartData = apiData.map((entry) => {
-    const plannedHours = Number(entry?.plannedHours);
     const realHours = Number(entry?.realHours);
 
-    const deltaInfo = getDeltaInfo(plannedHours, realHours);
     return {
       userId: entry.userId,
       label: String(entry?.label ?? ""),
-      plannedHours: Number.isFinite(plannedHours) ? plannedHours : 0,
       realHours: Number.isFinite(realHours) ? realHours : 0,
-      delta: deltaInfo.delta,
-      deltaLabel: deltaInfo.label,
       unit: "hrs",
     };
   });
 
-  const totalPlanned = chartData.reduce(
-    (acc, item) => acc + item.plannedHours,
-    0,
-  );
-  const totalReal = chartData.reduce((acc, item) => acc + item.realHours, 0);
-  const totalDelta = totalReal - totalPlanned;
-
-  const deltaLabel =
-    Math.abs(totalDelta) < 0.01
-      ? "Sin diferencia global entre horas planificadas y reales"
-      : totalDelta > 0
-        ? `Globalmente el equipo tardó más: ${formatHours(Math.abs(totalDelta), "hrs")}`
-        : `Globalmente el equipo tardó menos: ${formatHours(Math.abs(totalDelta), "hrs")}`;
-
-  const dynamicHeight = Math.max(230, Math.min(280, chartData.length * 42));
+  const dynamicHeight = Math.max(280, Math.min(340, chartData.length * 64));
 
   return (
     <div className={styles.root}>
@@ -198,31 +137,22 @@ const SprintDurationChart = ({ sprintId, color = "blue" }) => {
               width={44}
             />
             <Tooltip
-              content={(props) => <DurationTooltip {...props} />}
-              cursor={{ fill: secondaryColor, fillOpacity: 0.2 }}
+              content={(props) => <RealHoursTooltip {...props} />}
+              cursor={{ fill: primaryColor, fillOpacity: 0.2 }}
               wrapperStyle={{ outline: "none" }}
-            />
-            <Bar
-              dataKey="plannedHours"
-              name="Horas planificadas"
-              fill={secondaryColor}
-              radius={[6, 6, 0, 0]}
-              maxBarSize={30}
             />
             <Bar
               dataKey="realHours"
               name="Horas reales"
               fill={primaryColor}
               radius={[6, 6, 0, 0]}
-              maxBarSize={30}
+              maxBarSize={36}
             />
           </BarChart>
         </ResponsiveContainer>
       </div>
-
-      <div className={styles.delta}>{deltaLabel}</div>
     </div>
   );
 };
 
-export default SprintDurationChart;
+export default RealHoursByUser;

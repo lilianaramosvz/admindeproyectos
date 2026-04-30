@@ -6,11 +6,15 @@ import MiniChart from "../components/dashboard/MiniChart";
 import PrecisionEstimationChart from "../components/charts/PrecisionEstimationChart";
 import SprintDurationChart from "../components/charts/SprintDurationChart";
 import TasksByUserChart from "../components/charts/TasksByUserChart";
+import RealHoursByUser from "../components/charts/RealHoursByUser";
+import TasksHistoryChart from "../components/charts/TasksHistoryChart";
+import RealHoursHistoryChart from "../components/charts/RealHoursHistoryChart";
 import { useKpis } from "../hooks/useKpis";
 import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
+import { useRealHoursByUser } from "../hooks/useRealHoursByUser";
 import UserComplianceChart from "../components/charts/UserComplianceChart";
 import { getActiveSprints } from "../services/api";
 
@@ -115,6 +119,9 @@ export default function KPIScreen() {
     loading: precisionLoading,
     error: precisionError,
   } = usePrecisionEstimationByUser(effectiveSprintId);
+  const {
+    totalRealHours,
+  } = useRealHoursByUser(effectiveSprintId);
   const { kpisForCards, precisionValueFromChart, totalCompletedTasks } =
     useKpiCardValues({
       kpis,
@@ -203,25 +210,60 @@ export default function KPIScreen() {
 
         {/* MAIN KPIs */}
         <div className={styles.kpiGrid}>
-          {kpisForCards.map(({ key: kpiKey, ...kpiProps }) => (
-            <KpiCard key={kpiKey} {...kpiProps} />
-          ))}
+          {kpisForCards
+            .filter(({ key }) => key !== "precision")
+            .map(({ key: kpiKey, ...kpiProps }) => {
+              const cardProps =
+                kpiKey === "realHours"
+                  ? {
+                      ...kpiProps,
+                      value: `${Math.round(totalRealHours)} horas por equipo`,
+                    }
+                  : kpiProps;
+
+              return <KpiCard key={kpiKey} {...cardProps} />;
+            })}
         </div>
 
-        {/* charts */}
         <div className={styles.charts}>
+          <div className={styles.chartCard}>
+            <div className={styles.chartHeader}>
+              <div>
+                <h3>Tareas completadas por sprint</h3>
+                <p className={styles.chartMeta}>
+                  Tareas completadas por usuario en cada sprint
+                </p>
+              </div>
+            </div>
+            <TasksHistoryChart />
+          </div>
+
+          <div className={styles.chartCard}>
+            <div className={styles.chartHeader}>
+              <div>
+                <h3>Horas reales por sprint</h3>
+                <p className={styles.chartMeta}>
+                  Horas trabajadas por usuario en cada sprint
+                </p>
+              </div>
+            </div>
+            <RealHoursHistoryChart />
+          </div>
+
           {kpis.map((kpi) => (
             <div key={kpi.key} className={styles.chartCard}>
               <div className={styles.chartHeader}>
                 <div>
                   <h3>{kpi.title}</h3>
                   <p className={styles.chartMeta}>
-                    {kpi.key === "compliance"
-                      ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
-                      : kpi.key === "precision"
-                        ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
-                        : kpi.key === "duration"
+                    { kpi.key === "duration"
                           ? "Comparativo de tiempo real del sprint vs tiempo planificado"
+                      : kpi.key === "compliance"
+                        ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
+                        : kpi.key === "precision"
+                          ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
+                          : kpi.key === "duration"
+                            ? "Comparativo de tiempo real del sprint vs tiempo planificado"
                           : kpi.key === "cycleTime"
                             ? "Total de tareas completadas por cada integrante en el sprint activo"
                             : kpi.hasHistory
@@ -239,6 +281,8 @@ export default function KPIScreen() {
                 >
                   {kpi.key === "cycleTime"
                     ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
+                    : kpi.key === "realHours"
+                      ? `${Math.round(totalRealHours)} hrs por equipo`
                     : kpi.key === "precision"
                       ? precisionLoading
                         ? "..."
@@ -246,7 +290,9 @@ export default function KPIScreen() {
                       : kpi.value}
                 </span>
               </div>
-              {kpi.key === "compliance" ? (
+              {kpi.key === "cycleTime" ? (
+                <TasksByUserChart data={complianceByUser} color={kpi.color} />
+              ) : kpi.key === "compliance" ? (
                 <>
                   {complianceError ? (
                     <div className={styles.error}>{complianceError}</div>
@@ -280,11 +326,14 @@ export default function KPIScreen() {
                 </>
               ) : kpi.key === "duration" ? (
                 <SprintDurationChart
-                  comparison={kpi.durationComparison}
+                  sprintId={effectiveSprintId}
                   color={kpi.color}
                 />
-              ) : kpi.key === "cycleTime" ? (
-                <TasksByUserChart data={complianceByUser} color={kpi.color} />
+              ) : kpi.key === "realHours" ? (
+                <RealHoursByUser
+                  sprintId={effectiveSprintId}
+                  color={kpi.color}
+                />
               ) : (
                 <MiniChart
                   data={kpi.chartData}
