@@ -24,7 +24,6 @@ export default function Dashboard() {
     error: contextError,
   } = useKpiContext();
 
-  // Equipo del usuario
   const teamName = user?.idEquipo ?? "Equipo";
   const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
   const { data: complianceByUser } = useTaskComplianceByUser(sprintId);
