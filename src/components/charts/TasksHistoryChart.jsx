@@ -20,7 +20,7 @@ const USER_COLORS = [
   "color-mix(in srgb, var(--aqua) 75%, white 25%)",
 ];
 
-const VISIBLE_SPRINTS = ["Sprint 0", "Sprint 1", "Sprint 2"];
+const VISIBLE_SPRINT_IDS = [0, 1, 2, 3];
 
 function HistoryTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
@@ -68,10 +68,11 @@ export default function TasksHistoryChart() {
     );
   }
 
-  // ✅ Filtrar solo Sprint 0-2
-  const filteredSprints = sprints.filter((s) =>
-    VISIBLE_SPRINTS.includes(s.sprintName)
-  );
+  // Mostrar Sprint 0-3 (incluye Sprint con id 3)
+  const filteredSprints = sprints.filter((s) => {
+    const sprintId = Number(s.sprintId);
+    return Number.isFinite(sprintId) && VISIBLE_SPRINT_IDS.includes(sprintId);
+  });
 
   const totalTasks = filteredSprints.reduce((acc, sprintRow) => {
     return (
