@@ -142,6 +142,9 @@ export default function KPIScreen() {
           <p className={styles.intro}>
             Aquí puedes ver los KPI's clave de tu equipo para evaluar su
             desempeño y progreso.
+            Visualiza métricas como cumplimiento de tareas, precisión de
+            estimaciones, horas reales trabajadas y duración de sprints para
+            identificar áreas de mejora y celebrar los éxitos de tu equipo.
           </p>
           <p className={styles.contextMeta}>
             <span>Proyecto: {projectName}</span>
