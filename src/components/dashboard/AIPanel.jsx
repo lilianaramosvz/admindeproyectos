@@ -13,29 +13,29 @@ import styles from "../../styles/components/dashboard/AIPanel.module.css";
 import { analyzeFromDb } from "../../services/aiService";
 
 const SECTION_META = {
-  "ANÁLISIS":        { Icon: Info,          color: "blue",   label: "Análisis"  },
-  PROBLEMAS:         { Icon: AlertTriangle, color: "orange", label: "Problemas" },
-  "TAREAS CRÍTICAS": { Icon: AlertCircle,   color: "red",    label: "Críticas"  },
-  RECOMENDACIONES:   { Icon: Lightbulb,     color: "green",  label: "Ideas"     },
-  RIESGOS:           { Icon: Shield,        color: "purple", label: "Riesgos"   },
+  ANÁLISIS: { Icon: Info, color: "blue", label: "Análisis" },
+  PROBLEMAS: { Icon: AlertTriangle, color: "orange", label: "Problemas" },
+  "TAREAS CRÍTICAS": { Icon: AlertCircle, color: "red", label: "Críticas" },
+  RECOMENDACIONES: { Icon: Lightbulb, color: "green", label: "Ideas" },
+  RIESGOS: { Icon: Shield, color: "purple", label: "Riesgos" },
 };
 
-// Regex per header: case-insensitive, handles accent variants, optional colon,
-// and captures any inline content after the header (e.g. "ANÁLISIS: texto…")
+// Regex por cada sección, con clave estándar y captura del resto de la línea tras el título
 const HEADER_PATTERNS = [
-  { key: "ANÁLISIS",        re: /^an[aá]lisis\s*:?\s*(.*)/i },
-  { key: "PROBLEMAS",       re: /^problemas\s*:?\s*(.*)/i },
+  { key: "ANÁLISIS", re: /^an[aá]lisis\s*:?\s*(.*)/i },
+  { key: "PROBLEMAS", re: /^problemas\s*:?\s*(.*)/i },
+
   // Match either 'TAREAS CRÍTICAS' or just 'CRÍTICAS' / 'CRITICAS'
   { key: "TAREAS CRÍTICAS", re: /^(?:tareas\s+)?cr[ií]ticas\s*:?\s*(.*)/i },
+
   // Match 'RECOMENDACIONES' or synonym 'IDEAS'
   { key: "RECOMENDACIONES", re: /^(?:recomendaciones|ideas)\s*:?\s*(.*)/i },
-  { key: "RIESGOS",         re: /^riesgos\s*:?\s*(.*)/i },
+  { key: "RIESGOS", re: /^riesgos\s*:?\s*(.*)/i },
 ];
 
 function parseSections(items) {
   const out = [];
   let cur = null;
-  // Flatten by splitting on embedded newlines first
   const lines = items.flatMap((item) => item.split(/\r?\n/));
   for (const raw of lines) {
     const line = raw.trim();
@@ -48,7 +48,6 @@ function parseSections(items) {
     } else if (cur) {
       cur.lines.push(line);
     } else {
-      // Content before any recognized header → treat as ANÁLISIS
       cur = { key: "ANÁLISIS", lines: [line] };
     }
   }
@@ -123,7 +122,6 @@ export default function AIPanel() {
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     generate();
   }, []);
@@ -135,7 +133,7 @@ export default function AIPanel() {
 
   return (
     <aside className={styles.panel} aria-label="Recomendaciones de IA">
-      {/* ── Header ── */}
+      {/*Header*/}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.iconWrap} aria-hidden>
@@ -166,7 +164,7 @@ export default function AIPanel() {
         </div>
       </div>
 
-      {/* ── Tabs ── */}
+      {/*Tabs*/}
       {!loading && sections.length > 0 && (
         <div className={styles.tabs} role="tablist">
           {sections.map((s, i) => {
@@ -188,7 +186,7 @@ export default function AIPanel() {
         </div>
       )}
 
-      {/* ── Content ── */}
+      {/*Content*/}
       <div className={styles.content} role="tabpanel">
         {loading && (
           <p className={styles.loadingText}>Generando recomendación...</p>
@@ -199,7 +197,7 @@ export default function AIPanel() {
             className={`${styles.card} ${styles[`card_${activeMeta.color}`]}`}
           >
             {(() => {
-              // If this is the RECOMENDACIONES (Ideas) section, show only one recommendation.
+              // Si es la sección de ideas, mostrar solo la primera línea. Para las demás secciones, mostrar todo
               const isIdeas = active.key === "RECOMENDACIONES";
               const lines = isIdeas
                 ? active.lines.filter(Boolean).slice(0, 1)

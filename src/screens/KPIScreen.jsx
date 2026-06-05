@@ -16,7 +16,7 @@ import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByU
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import { useRealHoursByUser } from "../hooks/useRealHoursByUser";
 import UserComplianceChart from "../components/charts/UserComplianceChart";
-import { getActiveSprints } from "../services/api";
+import { getActiveProjects, getSprintsByProject } from "../services/api";
 
 import styles from "../styles/screens/KPIScreen.module.css";
 
@@ -25,55 +25,102 @@ export default function KPIScreen() {
     userId,
     projectId,
     sprintId,
-    userName,
     projectName,
     sprintName,
     loading: contextLoading,
     error: contextError,
   } = useKpiContext();
+
+  const [availableProjects, setAvailableProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [isProjectMenuOpen, setIsProjectMenuOpen] = useState(false);
+  const projectDropdownRef = useRef(null);
+
   const [availableSprints, setAvailableSprints] = useState([]);
   const [selectedSprintId, setSelectedSprintId] = useState(null);
   const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
   const sprintDropdownRef = useRef(null);
 
-  useEffect(() => {
-    if (sprintId == null) {
-      return;
-    }
+  const effectiveProjectId = selectedProjectId ?? projectId;
+  const effectiveSprintId = selectedSprintId ?? sprintId;
 
-    setSelectedSprintId((current) => current ?? sprintId);
-  }, [sprintId]);
-
+  // Cargar proyectos activos al montar el componente
   useEffect(() => {
     let isMounted = true;
-
-    async function loadSprints() {
-      try {
-        const response = await getActiveSprints();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setAvailableSprints(Array.isArray(response) ? response : []);
-      } catch {
-        if (isMounted) {
-          setAvailableSprints([]);
-        }
-      }
-    }
-
-    loadSprints();
-
+    getActiveProjects()
+      .then((data) => {
+        if (!isMounted) return;
+        setAvailableProjects(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (isMounted) setAvailableProjects([]);
+      });
     return () => {
       isMounted = false;
     };
   }, []);
 
+  // Inicializar selectedProjectId una vez que los proyectos están disponibles
   useEffect(() => {
-    if (!isSprintMenuOpen) {
-      return;
+    if (projectId == null) return;
+    setSelectedProjectId((current) => current ?? projectId);
+  }, [projectId]);
+
+  // Inicializar selectedSprintId una vez que el contexto esté listo
+  useEffect(() => {
+    if (sprintId == null) return;
+    setSelectedSprintId((current) => current ?? sprintId);
+  }, [sprintId]);
+
+  useEffect(() => {
+    if (effectiveProjectId == null) return;
+    let isMounted = true;
+    setAvailableSprints([]);
+    getSprintsByProject(effectiveProjectId)
+      .then((data) => {
+        if (!isMounted) return;
+        const list = Array.isArray(data) ? data : [];
+
+        const normalized = list.map((s) => ({ ...s, id: s.idSprint ?? s.id }));
+        setAvailableSprints(normalized);
+        setSelectedSprintId((current) => {
+          if (normalized.length === 0) return null;
+          if (current != null && normalized.some((s) => s.id === current))
+            return current;
+          return normalized[0].id;
+        });
+      })
+      .catch(() => {
+        if (isMounted) setAvailableSprints([]);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [effectiveProjectId]);
+
+  useEffect(() => {
+    if (!isProjectMenuOpen) return;
+
+    function handlePointerDown(event) {
+      if (!projectDropdownRef.current?.contains(event.target)) {
+        setIsProjectMenuOpen(false);
+      }
     }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") setIsProjectMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isProjectMenuOpen]);
+
+  useEffect(() => {
+    if (!isSprintMenuOpen) return;
 
     function handlePointerDown(event) {
       if (!sprintDropdownRef.current?.contains(event.target)) {
@@ -82,31 +129,30 @@ export default function KPIScreen() {
     }
 
     function handleEscape(event) {
-      if (event.key === "Escape") {
-        setIsSprintMenuOpen(false);
-      }
+      if (event.key === "Escape") setIsSprintMenuOpen(false);
     }
 
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleEscape);
-
     return () => {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
     };
   }, [isSprintMenuOpen]);
 
-  const effectiveSprintId = selectedSprintId ?? sprintId;
+  const selectedProjectName = useMemo(() => {
+    const selected = availableProjects.find((p) => p.id === effectiveProjectId);
+    return selected?.nombre || projectName;
+  }, [availableProjects, effectiveProjectId, projectName]);
+
   const selectedSprintName = useMemo(() => {
-    const selected = availableSprints.find(
-      (item) => item.id === effectiveSprintId,
-    );
+    const selected = availableSprints.find((s) => s.id === effectiveSprintId);
     return selected?.nombre || sprintName;
   }, [availableSprints, effectiveSprintId, sprintName]);
 
   const { kpis, loading, error } = useKpis({
     userId,
-    projectId,
+    projectId: effectiveProjectId ?? projectId,
     sprintId: effectiveSprintId,
   });
   const {
@@ -119,9 +165,7 @@ export default function KPIScreen() {
     loading: precisionLoading,
     error: precisionError,
   } = usePrecisionEstimationByUser(effectiveSprintId);
-  const {
-    totalRealHours,
-  } = useRealHoursByUser(effectiveSprintId);
+  const { totalRealHours } = useRealHoursByUser(effectiveSprintId);
   const { kpisForCards, precisionValueFromChart, totalCompletedTasks } =
     useKpiCardValues({
       kpis,
@@ -138,58 +182,56 @@ export default function KPIScreen() {
     <MainLayout title="KPIs">
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1>Indicadores Clave de Desempeño KPI's</h1>
-          <p className={styles.intro}>
-            Aquí puedes ver los KPI's clave de tu equipo para evaluar su
-            desempeño y progreso.
-            Visualiza métricas como cumplimiento de tareas, precisión de
-            estimaciones, horas reales trabajadas y duración de sprints para
-            identificar áreas de mejora y celebrar los éxitos de tu equipo.
-          </p>
-          <p className={styles.contextMeta}>
-            <span>Proyecto: {projectName}</span>
-            <span className={styles.sprintPicker} ref={sprintDropdownRef}>
+          <h1>Indicadores Clave de Desempeño</h1>
+        </div>
+
+        <div className={styles.selectors}>
+          <div className={styles.selectorGroup}>
+            <label className={styles.selectorLabel}>Proyecto</label>
+            <span className={styles.sprintPicker} ref={projectDropdownRef}>
               <button
                 type="button"
                 className={styles.sprintButton}
-                onClick={() => setIsSprintMenuOpen((open) => !open)}
-                aria-expanded={isSprintMenuOpen}
+                onClick={() => setIsProjectMenuOpen((open) => !open)}
+                disabled={availableProjects.length === 0}
+                aria-expanded={isProjectMenuOpen}
                 aria-haspopup="listbox"
               >
                 <span className={styles.sprintButtonLabel}>
-                  {selectedSprintName}
+                  {availableProjects.length === 0
+                    ? "Cargando..."
+                    : selectedProjectName}
                 </span>
                 <span
-                  className={`${styles.sprintChevron} ${isSprintMenuOpen ? styles.sprintChevronOpen : ""}`}
+                  className={`${styles.sprintChevron} ${isProjectMenuOpen ? styles.sprintChevronOpen : ""}`}
                   aria-hidden="true"
                 >
                   ▾
                 </span>
               </button>
-
-              {isSprintMenuOpen && availableSprints.length > 0 ? (
+              {isProjectMenuOpen && availableProjects.length > 0 && (
                 <div
                   className={styles.sprintMenu}
                   role="listbox"
-                  aria-label="Sprints disponibles"
+                  aria-label="Proyectos disponibles"
                 >
-                  {availableSprints.map((item) => {
-                    const isSelected = item.id === effectiveSprintId;
-
+                  {availableProjects.map((p) => {
+                    const isSelected = p.id === effectiveProjectId;
                     return (
                       <button
-                        key={item.id}
+                        key={p.id}
                         type="button"
                         role="option"
                         aria-selected={isSelected}
                         className={`${styles.sprintOption} ${isSelected ? styles.sprintOptionSelected : ""}`}
                         onClick={() => {
-                          setSelectedSprintId(item.id);
-                          setIsSprintMenuOpen(false);
+                          setSelectedProjectId(p.id);
+                          setSelectedSprintId(null);
+                          setIsProjectMenuOpen(false);
                         }}
                       >
                         <span className={styles.sprintOptionLabel}>
-                          {item.nombre}
+                          {p.nombre}
                         </span>
                         <span
                           className={styles.sprintOptionCheck}
@@ -201,9 +243,69 @@ export default function KPIScreen() {
                     );
                   })}
                 </div>
-              ) : null}
+              )}
             </span>
-          </p>
+          </div>
+
+          <div className={styles.selectorGroup}>
+            <label className={styles.selectorLabel}>Sprint</label>
+            <span className={styles.sprintPicker} ref={sprintDropdownRef}>
+              <button
+                type="button"
+                className={styles.sprintButton}
+                onClick={() => setIsSprintMenuOpen((open) => !open)}
+                disabled={availableSprints.length === 0}
+                aria-expanded={isSprintMenuOpen}
+                aria-haspopup="listbox"
+              >
+                <span className={styles.sprintButtonLabel}>
+                  {availableSprints.length === 0
+                    ? "Cargando..."
+                    : selectedSprintName}
+                </span>
+                <span
+                  className={`${styles.sprintChevron} ${isSprintMenuOpen ? styles.sprintChevronOpen : ""}`}
+                  aria-hidden="true"
+                >
+                  ▾
+                </span>
+              </button>
+              {isSprintMenuOpen && availableSprints.length > 0 && (
+                <div
+                  className={styles.sprintMenu}
+                  role="listbox"
+                  aria-label="Sprints disponibles"
+                >
+                  {availableSprints.map((s) => {
+                    const isSelected = s.id === effectiveSprintId;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        role="option"
+                        aria-selected={isSelected}
+                        className={`${styles.sprintOption} ${isSelected ? styles.sprintOptionSelected : ""}`}
+                        onClick={() => {
+                          setSelectedSprintId(s.id);
+                          setIsSprintMenuOpen(false);
+                        }}
+                      >
+                        <span className={styles.sprintOptionLabel}>
+                          {s.nombre}
+                        </span>
+                        <span
+                          className={styles.sprintOptionCheck}
+                          aria-hidden="true"
+                        >
+                          {isSelected ? "✓" : ""}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </span>
+          </div>
         </div>
 
         {contextError ? (
@@ -259,14 +361,12 @@ export default function KPIScreen() {
                 <div>
                   <h3>{kpi.title}</h3>
                   <p className={styles.chartMeta}>
-                    { kpi.key === "duration"
-                          ? "Comparativo de tiempo real del sprint vs tiempo planificado"
+                    {kpi.key === "duration"
+                      ? "Comparativo de tiempo real del sprint vs tiempo planificado"
                       : kpi.key === "compliance"
                         ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
                         : kpi.key === "precision"
                           ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
-                          : kpi.key === "duration"
-                            ? "Comparativo de tiempo real del sprint vs tiempo planificado"
                           : kpi.key === "cycleTime"
                             ? "Total de tareas completadas por cada integrante en el sprint activo"
                             : kpi.hasHistory
@@ -286,11 +386,11 @@ export default function KPIScreen() {
                     ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
                     : kpi.key === "realHours"
                       ? `${Math.round(totalRealHours)} hrs por equipo`
-                    : kpi.key === "precision"
-                      ? precisionLoading
-                        ? "..."
-                        : (precisionValueFromChart ?? "Sin datos")
-                      : kpi.value}
+                      : kpi.key === "precision"
+                        ? precisionLoading
+                          ? "..."
+                          : (precisionValueFromChart ?? "Sin datos")
+                        : kpi.value}
                 </span>
               </div>
               {kpi.key === "cycleTime" ? (

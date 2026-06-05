@@ -25,28 +25,31 @@
   color: var(--text-secondary);
 }
 
-.intro {
-  padding-top: 12px;
+.selectors {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.contextMeta {
-  align-items: center;
-  color: var(--text-secondary);
+.selectorGroup {
   display: flex;
-  font-size: 13px;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.selectorLabel {
+  font-size: 12px;
   font-weight: 500;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  border-left: 3px solid var(--blue);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .sprintPicker {
-  display: inline-block;
-  margin-left: auto;
+  display: block;
   position: relative;
+  width: 100%;
 }
 
 .sprintButton {
@@ -57,13 +60,18 @@
   box-shadow: none;
   color: var(--text-secondary);
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
+  font-family: inherit;
+  font-size: 14px;
   gap: 8px;
-  max-width: 190px;
-  min-height: 28px;
-  padding: 4px 10px;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  min-height: 36px;
+  padding: 6px 12px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   width: 100%;
+  text-align: left;
 }
 
 .sprintButton:hover {
@@ -76,7 +84,13 @@
   outline: none;
 }
 
+.sprintButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .sprintButtonLabel {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -88,12 +102,12 @@
   border: 1px solid var(--border-light);
   border-radius: 999px;
   color: var(--text-secondary);
+  display: inline-flex;
   font-size: 12px;
   height: 18px;
   justify-content: center;
   line-height: 1;
   width: 18px;
-  display: inline-flex;
   transform: rotate(0deg);
   transition: transform 0.2s ease;
 }
@@ -110,9 +124,9 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-top: 8px;
-  min-width: 132px;
-  width: 132px;
+  margin-top: 6px;
+  min-width: 200px;
+  width: 100%;
   padding: 8px;
   position: absolute;
   left: 0;
@@ -128,6 +142,7 @@
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
+  font-family: inherit;
   font-size: 13px;
   font-weight: 500;
   justify-content: space-between;
@@ -144,7 +159,7 @@
 
 .sprintOptionSelected {
   background: var(--bg-secondary);
-  border-left-color: var(--border-light);
+  border-left-color: var(--blue);
   color: var(--text-primary);
 }
 
@@ -155,6 +170,7 @@
 }
 
 .sprintOptionCheck {
+  color: var(--blue);
   font-size: 12px;
   font-weight: 700;
   min-width: 16px;
@@ -246,24 +262,12 @@
 }
 
 @media (max-width: 720px) {
-  .contextMeta {
-    align-items: flex-start;
+  .selectors {
     flex-direction: column;
   }
 
-  .sprintPicker {
-    display: block;
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .sprintButton {
-    max-width: none;
-    width: 100%;
-  }
-
-  .sprintMenu {
-    min-width: 100%;
+  .selectorGroup {
+    min-width: 0;
   }
 
   .kpiGrid {

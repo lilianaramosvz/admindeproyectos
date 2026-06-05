@@ -48,7 +48,6 @@ export default function Dashboard() {
           <p className={styles.intro}>
             ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
           </p>
-
         </div>
 
         {contextError ? (

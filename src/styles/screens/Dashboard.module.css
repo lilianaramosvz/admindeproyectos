@@ -20,12 +20,6 @@
   padding-top: 12px;
 }
 
-.contextMeta {
-  color: var(--text-tertiary);
-  font-size: 12px;
-  margin-top: 8px;
-}
-
 .kpiGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
