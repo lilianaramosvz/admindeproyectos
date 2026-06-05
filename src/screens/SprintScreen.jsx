@@ -8,6 +8,7 @@ import {
   getTasksBySprint,
   updateTaskStatus,
 } from "../services/api";
+import { useSelection } from "../context/SelectionContext";
 import styles from "../styles/screens/SprintScreen.module.css";
 
 const COLUMNS = [
@@ -38,6 +39,7 @@ export default function SprintScreen() {
   const [editingStatus, setEditingStatus] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const { setSprintId: setSharedSprintId, setSprintName: setSharedSprintName } = useSelection();
   const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
   const sprintDropdownRef = useRef(null);
   const [isProjectMenuOpen, setIsProjectMenuOpen] = useState(false);
@@ -309,6 +311,8 @@ export default function SprintScreen() {
                         className={`${styles.sprintOption} ${isSelected ? styles.sprintOptionSelected : ""}`}
                         onClick={() => {
                           setSelectedSprintId(s.idSprint);
+                          setSharedSprintId(s.idSprint);
+                          setSharedSprintName(s.nombre);
                           setIsSprintMenuOpen(false);
                         }}
                       >

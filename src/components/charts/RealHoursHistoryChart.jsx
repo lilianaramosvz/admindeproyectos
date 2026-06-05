@@ -86,7 +86,9 @@ export default function RealHoursHistoryChart() {
 
   return (
     <div className={styles.root}>
-      <div className={styles.totalLabel}>{totalHours.toFixed(1)} hrs totales</div>
+      <div className={styles.totalLabel}>
+        {totalHours.toFixed(1)} hrs totales
+      </div>
 
       <div className={styles.chartWrapper}>
         <ResponsiveContainer width="100%" height="100%">

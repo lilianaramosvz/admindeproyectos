@@ -10,8 +10,7 @@ function getHeaders(additional = {}) {
   try {
     const token = localStorage.getItem("authToken");
     if (token) headers.Authorization = `Bearer ${token}`;
-  } catch (e) {
-  }
+  } catch (e) {}
 
   return headers;
 }
@@ -104,6 +103,10 @@ async function postJson(path, body, token = null) {
   }
 
   return res.json();
+}
+
+export function getTasksByUser(userId) {
+  return getJson(`/api/tasks/user/${userId}`);
 }
 
 export function getSprintsByProject(projectId) {

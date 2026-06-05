@@ -8,6 +8,7 @@ import KPIScreen from "./screens/KPIScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import { AuthProvider } from "./context/AuthContext";
+import { SelectionProvider } from "./context/SelectionContext";
 import { ProtectedRoute } from "./context/ProtectedRoute";
 import { MensajeManager } from "./components/messageKafka/MensajeManager";
 import AsistenteIAScreen from "./screens/AsistenteIAScreen";
@@ -23,6 +24,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SelectionProvider>
         <MensajeManager />
         <Routes>
           <Route path="/login" element={<LoginScreen />} />
@@ -122,6 +124,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        </SelectionProvider>
       </AuthProvider>
     </BrowserRouter>
   );
