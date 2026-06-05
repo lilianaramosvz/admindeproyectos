@@ -5,6 +5,10 @@
   gap: 24px;
 }
 
+.intro {
+  padding-top: 12px;
+}
+
 .error {
   background: rgba(247, 161, 99, 0.12);
   border: 1px solid rgba(247, 161, 99, 0.35);
