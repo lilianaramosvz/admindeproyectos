@@ -6,6 +6,7 @@ import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import { useAuth } from "../context/AuthContext";
+import { useSelection } from "../context/SelectionContext";
 import SprintBoard from "../components/dashboard/SprintBoard";
 import AIPanel from "../components/dashboard/AIPanel";
 import styles from "../styles/screens/Dashboard.module.css";
@@ -23,9 +24,13 @@ export default function Dashboard() {
     error: contextError,
   } = useKpiContext();
 
+  const { sprintId: sharedSprintId, sprintName: sharedSprintName } = useSelection();
+  const effectiveSprintId = sharedSprintId ?? sprintId;
+  const effectiveSprintName = sharedSprintName || sprintName;
+
   const teamName = user?.idEquipo ?? "Equipo";
-  const { kpis, loading, error } = useKpis({ userId, projectId, sprintId });
-  const { data: complianceByUser } = useTaskComplianceByUser(sprintId);
+  const { kpis, loading, error } = useKpis({ userId, projectId, sprintId: effectiveSprintId });
+  const { data: complianceByUser } = useTaskComplianceByUser(effectiveSprintId);
   const { kpisForCards } = useKpiCardValues({
     kpis,
     complianceByUser,
@@ -48,6 +53,9 @@ export default function Dashboard() {
           <p className={styles.intro}>
             ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
           </p>
+          {effectiveSprintName && (
+            <span className={styles.sprintChip}>{effectiveSprintName}</span>
+          )}
         </div>
 
         {contextError ? (
@@ -64,7 +72,7 @@ export default function Dashboard() {
 
         {/*SprintBoard e IA*/}
         <div className={styles.bottom}>
-          <SprintBoard />
+          <SprintBoard sprintId={effectiveSprintId} sprintName={effectiveSprintName} />
           <AIPanel />
         </div>
       </div>

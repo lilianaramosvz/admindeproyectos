@@ -15,8 +15,8 @@ import { useKpiContext } from "../hooks/useKpiContext";
 import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import { useRealHoursByUser } from "../hooks/useRealHoursByUser";
-import UserComplianceChart from "../components/charts/UserComplianceChart";
 import { getActiveProjects, getSprintsByProject } from "../services/api";
+import { useSelection } from "../context/SelectionContext";
 
 import styles from "../styles/screens/KPIScreen.module.css";
 
@@ -40,6 +40,11 @@ export default function KPIScreen() {
   const [selectedSprintId, setSelectedSprintId] = useState(null);
   const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
   const sprintDropdownRef = useRef(null);
+  const {
+    sprintId: sharedSprintId,
+    setSprintId: setSharedSprintId,
+    setSprintName: setSharedSprintName,
+  } = useSelection();
 
   const effectiveProjectId = selectedProjectId ?? projectId;
   const effectiveSprintId = selectedSprintId ?? sprintId;
@@ -69,8 +74,12 @@ export default function KPIScreen() {
   // Inicializar selectedSprintId una vez que el contexto esté listo
   useEffect(() => {
     if (sprintId == null) return;
-    setSelectedSprintId((current) => current ?? sprintId);
-  }, [sprintId]);
+    setSelectedSprintId((current) => current ?? sharedSprintId ?? sprintId);
+    if (sharedSprintId == null) {
+      setSharedSprintId(sprintId);
+      setSharedSprintName(sprintName);
+    }
+  }, [sprintId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (effectiveProjectId == null) return;
@@ -157,8 +166,6 @@ export default function KPIScreen() {
   });
   const {
     data: complianceByUser,
-    loading: complianceLoading,
-    error: complianceError,
   } = useTaskComplianceByUser(effectiveSprintId);
   const {
     data: precisionByUser,
@@ -184,7 +191,8 @@ export default function KPIScreen() {
         <div className={styles.header}>
           <h1>Indicadores Clave de Desempeño</h1>
           <p className={styles.intro}>
-            Visualiza y analiza los KPI's de tus proyectos para ver el desempeño de tu equipo
+            Visualiza y analiza los KPI's de tus proyectos para ver el desempeño
+            de tu equipo
           </p>
         </div>
 
@@ -290,6 +298,8 @@ export default function KPIScreen() {
                         className={`${styles.sprintOption} ${isSelected ? styles.sprintOptionSelected : ""}`}
                         onClick={() => {
                           setSelectedSprintId(s.id);
+                          setSharedSprintId(s.id);
+                          setSharedSprintName(s.nombre);
                           setIsSprintMenuOpen(false);
                         }}
                       >
@@ -358,7 +368,9 @@ export default function KPIScreen() {
             <RealHoursHistoryChart />
           </div>
 
-          {kpis.map((kpi) => (
+          {kpis
+            .filter((kpi) => kpi.key !== "compliance")
+            .map((kpi) => (
             <div key={kpi.key} className={styles.chartCard}>
               <div className={styles.chartHeader}>
                 <div>
@@ -366,15 +378,13 @@ export default function KPIScreen() {
                   <p className={styles.chartMeta}>
                     {kpi.key === "duration"
                       ? "Comparativo de tiempo real del sprint vs tiempo planificado"
-                      : kpi.key === "compliance"
-                        ? "Cumplimiento de tareas completadas por usuario en el sprint activo"
-                        : kpi.key === "precision"
-                          ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
-                          : kpi.key === "cycleTime"
-                            ? "Total de tareas completadas por cada integrante en el sprint activo"
-                            : kpi.hasHistory
-                              ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
-                              : "Sin historial: mostrando valor actual"}
+                      : kpi.key === "precision"
+                        ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
+                        : kpi.key === "cycleTime"
+                          ? "Total de tareas completadas por cada integrante en el sprint activo"
+                          : kpi.hasHistory
+                            ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
+                            : "Sin historial: mostrando valor actual"}
                   </p>
                 </div>
                 <span
@@ -398,22 +408,6 @@ export default function KPIScreen() {
               </div>
               {kpi.key === "cycleTime" ? (
                 <TasksByUserChart data={complianceByUser} color={kpi.color} />
-              ) : kpi.key === "compliance" ? (
-                <>
-                  {complianceError ? (
-                    <div className={styles.error}>{complianceError}</div>
-                  ) : null}
-                  {complianceLoading ? (
-                    <div className={styles.chartMeta}>
-                      Cargando cumplimiento por usuario...
-                    </div>
-                  ) : (
-                    <UserComplianceChart
-                      data={complianceByUser}
-                      color={kpi.color}
-                    />
-                  )}
-                </>
               ) : kpi.key === "precision" ? (
                 <>
                   {precisionError ? (

@@ -108,10 +108,10 @@ function EstimationTooltip({ active, payload }) {
 
 export default function PrecisionEstimationChart({
   data = [],
-  color = "purple",
+  color = "orange",
 }) {
   const primaryColor = COLOR_MAP[color] || COLOR_MAP.purple;
-  const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.purple;
+  const secondaryColor = SOFT_COLOR_MAP[color] || SOFT_COLOR_MAP.orange;
 
   if (!Array.isArray(data) || data.length === 0) {
     return (

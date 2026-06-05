@@ -11,6 +11,21 @@
   color: var(--text-primary);
 }
 
+.sprintChip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(108, 162, 248, 0.28);
+  background: var(--blue-chart-soft);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
 .header p {
   color: var(--text-secondary);
   font-size: 14px;

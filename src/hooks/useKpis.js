@@ -94,7 +94,7 @@ const KPI_DEFINITIONS = [
     key: "precision",
     title: "Precisión de estimación de carga",
     historyType: "PRECISION_ESTIMACION",
-    color: "purple",
+    color: "orange",
     scope: "user",
     unit: "%",
     aliases: [
