@@ -183,6 +183,9 @@ export default function KPIScreen() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Indicadores Clave de Desempeño</h1>
+          <p className={styles.intro}>
+            Visualiza y analiza los KPI's de tus proyectos para ver el desempeño de tu equipo
+          </p>
         </div>
 
         <div className={styles.selectors}>

@@ -199,7 +199,9 @@ export default function SprintScreen() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Sprint</h1>
-          <p>Vista general del progreso de tu equipo.</p>
+          <p className={styles.intro}>
+            ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
+          </p>
         </div>
 
         <div className={styles.selectors}>
