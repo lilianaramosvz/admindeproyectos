@@ -106,6 +106,31 @@ async function postJson(path, body, token = null) {
   return res.json();
 }
 
+export function getSprintsByProject(projectId) {
+  return getJson(`/api/sprints/project/${projectId}`);
+}
+
+export function getTasksBySprint(sprintId) {
+  return getJson(`/api/tasks/sprint/${sprintId}`);
+}
+
+async function patchJson(path, body) {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "PATCH",
+    headers: getHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(`Error ${res.status} al actualizar ${path}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+export function updateTaskStatus(taskId, taskData) {
+  return patchJson(`/api/tasks/${taskId}/status`, taskData);
+}
+
 export function loginUser(correo, password) {
   return postJson("/api/v1/auth/login", { correo, password });
 }

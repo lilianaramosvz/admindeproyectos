@@ -150,32 +150,6 @@
   cursor: not-allowed;
 }
 
-.passwordToggle {
-  position: absolute;
-  right: 12px;
-  background: transparent;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  cursor: pointer;
-  color: var(--text-tertiary);
-}
-
-.passwordToggle:focus {
-  outline: none;
-}
-
-.passwordToggle:hover {
-  color: var(--blue);
-}
-
-.toggleIcon {
-  position: static;
-  color: inherit;
-}
-
 .errorMessage {
   padding: 12px;
   background: rgba(239, 68, 68, 0.1);
@@ -229,15 +203,6 @@
   cursor: not-allowed;
 }
 
-/* Footer */
-.footer {
-  margin-top: 24px;
-  font-size: 12px;
-  color: var(--text-tertiary);
-  text-align: center;
-  margin: 0;
-}
-
 /* Responsive */
 @media (max-width: 480px) {
   .card {
@@ -257,7 +222,6 @@
   }
 }
 
-/* Toggle Password Button */
 .togglePasswordButton {
   position: absolute;
   right: 12px;
