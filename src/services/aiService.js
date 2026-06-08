@@ -28,9 +28,6 @@ async function request(path, { body, queryParams } = {}) {
   return text ? { message: text } : {};
 }
 
-/**
- * POST /ai/chat?userId=X&sprintId=Y  { message }
- */
 export function chat(userId, sprintId, message) {
   return request("/api/ai/chat", {
     body: { message },
@@ -38,25 +35,16 @@ export function chat(userId, sprintId, message) {
   });
 }
 
-/**
- * POST /ai/analyze-from-db   (sin body)
- */
 export function analyzeFromDb() {
   return request("/api/ai/analyze-from-db");
 }
 
-/**
- * POST /ai/analyze-dashboard  { activeTasks, users }
- */
 export function analyzeDashboard({ activeTasks = [], users = [] } = {}) {
   return request("/api/ai/analyze-dashboard", {
     body: { activeTasks, users },
   });
 }
 
-/**
- * GET /ai/health
- */
 export async function healthCheck() {
   const res = await fetch(`${AI_BASE.replace(/\/$/, "")}/api/ai/health`);
   return res.ok;

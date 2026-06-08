@@ -24,12 +24,21 @@ export default function Dashboard() {
     error: contextError,
   } = useKpiContext();
 
-  const { sprintId: sharedSprintId, sprintName: sharedSprintName } = useSelection();
+  const displayName = user
+    ? `${user.nombre ?? ""} ${user.apellido ?? ""}`.trim()
+    : "";
+
+  const { sprintId: sharedSprintId, sprintName: sharedSprintName } =
+    useSelection();
   const effectiveSprintId = sharedSprintId ?? sprintId;
   const effectiveSprintName = sharedSprintName || sprintName;
 
   const teamName = user?.idEquipo ?? "Equipo";
-  const { kpis, loading, error } = useKpis({ userId, projectId, sprintId: effectiveSprintId });
+  const { kpis, loading, error } = useKpis({
+    userId,
+    projectId,
+    sprintId: effectiveSprintId,
+  });
   const { data: complianceByUser } = useTaskComplianceByUser(effectiveSprintId);
   const { kpisForCards } = useKpiCardValues({
     kpis,
@@ -51,7 +60,12 @@ export default function Dashboard() {
         <div className={styles.header}>
           <h1>Dashboard</h1>
           <p className={styles.intro}>
-            ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
+            {displayName
+              ? `¡Bienvenido, ${displayName}!`
+              : "Tus tareas asignadas."}
+          </p>
+          <p className={styles.intro}>
+            Esta es la vista general del progreso de tu equipo {teamName}.
           </p>
           {effectiveSprintName && (
             <span className={styles.sprintChip}>{effectiveSprintName}</span>
@@ -72,7 +86,10 @@ export default function Dashboard() {
 
         {/*SprintBoard e IA*/}
         <div className={styles.bottom}>
-          <SprintBoard sprintId={effectiveSprintId} sprintName={effectiveSprintName} />
+          <SprintBoard
+            sprintId={effectiveSprintId}
+            sprintName={effectiveSprintName}
+          />
           <AIPanel />
         </div>
       </div>

@@ -39,7 +39,8 @@ export default function SprintScreen() {
   const [editingStatus, setEditingStatus] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
-  const { setSprintId: setSharedSprintId, setSprintName: setSharedSprintName } = useSelection();
+  const { setSprintId: setSharedSprintId, setSprintName: setSharedSprintName } =
+    useSelection();
   const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
   const sprintDropdownRef = useRef(null);
   const [isProjectMenuOpen, setIsProjectMenuOpen] = useState(false);

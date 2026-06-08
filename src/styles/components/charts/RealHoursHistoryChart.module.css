@@ -62,10 +62,6 @@
   text-align: center;
 }
 
-/* Agregar al final de TasksHistoryChart.module.css
-   Y también al final de RealHoursHistoryChart.module.css */
-
-/* ✅ Leyenda */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -96,7 +92,6 @@
   font-weight: 500;
 }
 
-/* ✅ Punto de color en tooltip */
 .tooltipDot {
   display: inline-block;
   width: 8px;
