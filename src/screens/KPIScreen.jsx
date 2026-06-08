@@ -79,7 +79,7 @@ export default function KPIScreen() {
       setSharedSprintId(sprintId);
       setSharedSprintName(sprintName);
     }
-  }, [sprintId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sprintId]);
 
   useEffect(() => {
     if (effectiveProjectId == null) return;
@@ -164,9 +164,7 @@ export default function KPIScreen() {
     projectId: effectiveProjectId ?? projectId,
     sprintId: effectiveSprintId,
   });
-  const {
-    data: complianceByUser,
-  } = useTaskComplianceByUser(effectiveSprintId);
+  const { data: complianceByUser } = useTaskComplianceByUser(effectiveSprintId);
   const {
     data: precisionByUser,
     loading: precisionLoading,
@@ -371,78 +369,78 @@ export default function KPIScreen() {
           {kpis
             .filter((kpi) => kpi.key !== "compliance")
             .map((kpi) => (
-            <div key={kpi.key} className={styles.chartCard}>
-              <div className={styles.chartHeader}>
-                <div>
-                  <h3>{kpi.title}</h3>
-                  <p className={styles.chartMeta}>
-                    {kpi.key === "duration"
-                      ? "Comparativo de tiempo real del sprint vs tiempo planificado"
-                      : kpi.key === "precision"
-                        ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
-                        : kpi.key === "cycleTime"
-                          ? "Total de tareas completadas por cada integrante en el sprint activo"
-                          : kpi.hasHistory
-                            ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
-                            : "Sin historial: mostrando valor actual"}
-                  </p>
+              <div key={kpi.key} className={styles.chartCard}>
+                <div className={styles.chartHeader}>
+                  <div>
+                    <h3>{kpi.title}</h3>
+                    <p className={styles.chartMeta}>
+                      {kpi.key === "duration"
+                        ? "Comparativo de tiempo real del sprint vs tiempo planificado"
+                        : kpi.key === "precision"
+                          ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
+                          : kpi.key === "cycleTime"
+                            ? "Total de tareas completadas por cada integrante en el sprint activo"
+                            : kpi.hasHistory
+                              ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
+                              : "Sin historial: mostrando valor actual"}
+                    </p>
+                  </div>
+                  <span
+                    className={`${styles.chartValue} ${kpi.key === "duration" ? styles.chartValueDuration : ""} ${
+                      kpi.key === "duration" &&
+                      /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
+                        ? styles.chartValueDurationZero
+                        : ""
+                    }`}
+                  >
+                    {kpi.key === "cycleTime"
+                      ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
+                      : kpi.key === "realHours"
+                        ? `${Math.round(totalRealHours)} hrs por equipo`
+                        : kpi.key === "precision"
+                          ? precisionLoading
+                            ? "..."
+                            : (precisionValueFromChart ?? "Sin datos")
+                          : kpi.value}
+                  </span>
                 </div>
-                <span
-                  className={`${styles.chartValue} ${kpi.key === "duration" ? styles.chartValueDuration : ""} ${
-                    kpi.key === "duration" &&
-                    /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
-                      ? styles.chartValueDurationZero
-                      : ""
-                  }`}
-                >
-                  {kpi.key === "cycleTime"
-                    ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
-                    : kpi.key === "realHours"
-                      ? `${Math.round(totalRealHours)} hrs por equipo`
-                      : kpi.key === "precision"
-                        ? precisionLoading
-                          ? "..."
-                          : (precisionValueFromChart ?? "Sin datos")
-                        : kpi.value}
-                </span>
+                {kpi.key === "cycleTime" ? (
+                  <TasksByUserChart data={complianceByUser} color={kpi.color} />
+                ) : kpi.key === "precision" ? (
+                  <>
+                    {precisionError ? (
+                      <div className={styles.error}>{precisionError}</div>
+                    ) : null}
+                    {precisionLoading ? (
+                      <div className={styles.chartMeta}>
+                        Cargando precisión de estimación por usuario...
+                      </div>
+                    ) : (
+                      <PrecisionEstimationChart
+                        data={precisionByUser}
+                        color={kpi.color}
+                      />
+                    )}
+                  </>
+                ) : kpi.key === "duration" ? (
+                  <SprintDurationChart
+                    sprintId={effectiveSprintId}
+                    color={kpi.color}
+                  />
+                ) : kpi.key === "realHours" ? (
+                  <RealHoursByUser
+                    sprintId={effectiveSprintId}
+                    color={kpi.color}
+                  />
+                ) : (
+                  <MiniChart
+                    data={kpi.chartData}
+                    color={kpi.color}
+                    unit={kpi.unit}
+                  />
+                )}
               </div>
-              {kpi.key === "cycleTime" ? (
-                <TasksByUserChart data={complianceByUser} color={kpi.color} />
-              ) : kpi.key === "precision" ? (
-                <>
-                  {precisionError ? (
-                    <div className={styles.error}>{precisionError}</div>
-                  ) : null}
-                  {precisionLoading ? (
-                    <div className={styles.chartMeta}>
-                      Cargando precisión de estimación por usuario...
-                    </div>
-                  ) : (
-                    <PrecisionEstimationChart
-                      data={precisionByUser}
-                      color={kpi.color}
-                    />
-                  )}
-                </>
-              ) : kpi.key === "duration" ? (
-                <SprintDurationChart
-                  sprintId={effectiveSprintId}
-                  color={kpi.color}
-                />
-              ) : kpi.key === "realHours" ? (
-                <RealHoursByUser
-                  sprintId={effectiveSprintId}
-                  color={kpi.color}
-                />
-              ) : (
-                <MiniChart
-                  data={kpi.chartData}
-                  color={kpi.color}
-                  unit={kpi.unit}
-                />
-              )}
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </MainLayout>
