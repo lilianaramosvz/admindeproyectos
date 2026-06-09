@@ -15,6 +15,8 @@
   font-size: 14px;
 }
 
+
+
 .searchBar input:focus {
   border-color: #3b82f6;
   background: var(--bg-primary);
@@ -30,14 +32,63 @@
   width: 14px;
 }
 
+
 .wrapperSearch {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 12px;
-  padding: 10px 0;
+  padding: 10px 12px;
   width: 100%;
   margin-top: 16px;
-  overflow: hidden;
+  overflow: visible; /* 👈 cambia hidden por visible */
+  position: relative; /* 👈 agrega esto */
+  display: flex; /* 👈 agrega esto */
+  align-items: center; /* 👈 agrega esto */
+  gap: 8px; /* 👈 agrega esto */
+  box-sizing: border-box;
+}
+
+.filterDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 12px; /* 👈 se alinea al botón filtrar */
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.filterOption {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+}
+
+.filterOption:hover {
+  background: var(--bg-secondary);
+}
+
+.filterOptionActive {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .wrapper {
@@ -109,3 +160,23 @@
   color: var(--text-secondary);
   font-size: 14px;
 }
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: var(--bg-primary);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease;
+}
+
+.filterButton:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
