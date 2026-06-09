@@ -1,4 +1,5 @@
-import React from 'react';
+//frontend\src\components\charts\RealHoursByUser.jsx
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -7,9 +8,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-} from 'recharts';
-import { useRealHoursByUser } from '../../hooks/useRealHoursByUser';
-import styles from '../../styles/components/charts/RealHoursByUser.module.css';
+} from "recharts";
+import { useRealHoursByUser } from "../../hooks/useRealHoursByUser";
+import styles from "../../styles/components/charts/RealHoursByUser.module.css";
 
 const COLOR_MAP = {
   blue: "var(--blue)",

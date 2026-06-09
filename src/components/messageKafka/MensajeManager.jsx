@@ -17,15 +17,12 @@ function Banner({ id, tipo, texto, onClose }) {
       {/* Barra de color lateral */}
       <div className={styles.barraLateral} />
 
-      {/* Título */}
       <p className={styles.titulo}>
         {isAlerta ? "Mensaje del administrador URGENTE" : "Recordatorio"}
       </p>
 
-      {/* Texto del mensaje */}
       <p className={styles.texto}>{texto}</p>
 
-      {/* Botón cerrar */}
       <button onClick={() => onClose(id)} className={styles.botonCerrar}>
         ✕
       </button>

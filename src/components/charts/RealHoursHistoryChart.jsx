@@ -1,3 +1,4 @@
+//frontend\src\components\charts\RealHoursHistoryChart.jsx
 import React from "react";
 import {
   Bar,
@@ -68,7 +69,6 @@ export default function RealHoursHistoryChart() {
     );
   }
 
-  // Mostrar Sprint 0-3 (incluye Sprint con id 3)
   const filteredSprints = sprints.filter((s) => {
     const sprintId = Number(s.sprintId);
     return Number.isFinite(sprintId) && VISIBLE_SPRINT_IDS.includes(sprintId);

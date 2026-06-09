@@ -1,6 +1,11 @@
 // frontend/src/hooks/useBacklogTasks.js
 import { useEffect, useState } from "react";
-import { getActiveSprints, getTasksBySprint, getActiveUsers, getTasksByUser } from "../services/api";
+import {
+  getActiveSprints,
+  getTasksBySprint,
+  getActiveUsers,
+  getTasksByUser,
+} from "../services/api";
 
 const normalizePriority = (id) => {
   if (id === 1) return "low";
@@ -13,12 +18,18 @@ const buildAssigneeName = (user) => {
   return (
     [user.nombre, user.apellidoPaterno, user.apellidoMaterno]
       .filter(Boolean)
-      .join(" ") || (user.name ?? user.email ?? "Equipo ")
+      .join(" ") ||
+    (user.name ?? user.email ?? "Equipo ")
   );
 };
 
 const getInitials = (name) =>
-  name.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("") || "?";
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("") || "?";
 
 const normalizeTask = (task, sprintName, taskOwnerMap) => {
   if (!task || typeof task !== "object") return null;
@@ -30,9 +41,9 @@ const normalizeTask = (task, sprintName, taskOwnerMap) => {
     priority: normalizePriority(task.idPrioridad),
     complexity: Math.min(Math.max(Number(task.complejidad) || 1, 1), 5),
     hours: task.tiempoEstimado != null ? `${task.tiempoEstimado}h` : "—",
-    tiempoReal: task.tiempoReal ?? null,          
-    fechaLimite: task.fechaLimite ?? null,        
-    fechaFin: task.fechaFin ?? null,              
+    tiempoReal: task.tiempoReal ?? null,
+    fechaLimite: task.fechaLimite ?? null,
+    fechaFin: task.fechaFin ?? null,
     assignee: owner?.initials ?? "Eq",
     name: owner?.name ?? "Equipo 44",
     sprint: sprintName,
@@ -52,30 +63,36 @@ export function useBacklogTasks() {
         setLoading(true);
         setError(null);
 
-        // 1. Sprints y usuarios en paralelo
+        // Sprints y usuarios en paralelo
         const [sprints, users] = await Promise.all([
           getActiveSprints(),
           getActiveUsers(),
         ]);
 
         if (!Array.isArray(sprints) || sprints.length === 0) {
-          if (isActive) { setTasks([]); setLoading(false); }
+          if (isActive) {
+            setTasks([]);
+            setLoading(false);
+          }
           return;
         }
 
-        // 2. Tareas por sprint y tareas por usuario en paralelo
+        // Tareas por sprint y tareas por usuario en paralelo
         const [taskResults, userTaskResults] = await Promise.all([
           Promise.allSettled(sprints.map((s) => getTasksBySprint(s.id))),
           Promise.allSettled(
             (users ?? []).map((u) =>
-              getTasksByUser(u.id).then((tasks) => ({ user: u, tasks: tasks ?? [] }))
-            )
+              getTasksByUser(u.id).then((tasks) => ({
+                user: u,
+                tasks: tasks ?? [],
+              })),
+            ),
           ),
         ]);
 
         if (!isActive) return;
 
-        // 3. Construir mapa idTarea -> propietario
+        // Construir mapa idTarea a propietario
         const taskOwnerMap = {};
         userTaskResults
           .filter((r) => r.status === "fulfilled")
@@ -86,15 +103,19 @@ export function useBacklogTasks() {
             });
           });
 
-        // 4. Normalizar tareas
-        const normalized = sprints.flatMap((sprint, index) => {
-          const result = taskResults[index];
-          if (result?.status !== "fulfilled" || !Array.isArray(result.value)) return [];
-          const sprintName = sprint.nombre ?? sprint.name ?? `Sprint ${sprint.id}`;
-          return result.value
-            .map((task) => normalizeTask(task, sprintName, taskOwnerMap))
-            .filter(Boolean);
-        }).reverse(); // Mostrar las tareas del sprint más reciente primero
+        // Normalizar tareas
+        const normalized = sprints
+          .flatMap((sprint, index) => {
+            const result = taskResults[index];
+            if (result?.status !== "fulfilled" || !Array.isArray(result.value))
+              return [];
+            const sprintName =
+              sprint.nombre ?? sprint.name ?? `Sprint ${sprint.id}`;
+            return result.value
+              .map((task) => normalizeTask(task, sprintName, taskOwnerMap))
+              .filter(Boolean);
+          })
+          .reverse(); // Mostrar las tareas del sprint más reciente primero
 
         setTasks(normalized);
         if (normalized.length === 0) {
@@ -110,7 +131,9 @@ export function useBacklogTasks() {
     }
 
     loadTasks();
-    return () => { isActive = false; };
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   return { tasks, loading, error };

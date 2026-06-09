@@ -98,7 +98,6 @@ const extractTaskCounts = (response) => {
     const text = String(detailsText ?? "");
     if (!text) return { completed: null, assigned: null };
 
-    // Examples: "9 / 9 tareas", "8/10 tasks"
     const slashMatch = text.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
     if (slashMatch) {
       const completedValue = toNumber(slashMatch[1]);
@@ -134,12 +133,10 @@ const extractTaskCounts = (response) => {
     return parsedFromDetails;
   }
 
-  // If both are present and consistent, return them
   if (completed !== null && assigned !== null && assigned >= completed) {
     return { completed, assigned };
   }
 
-  // Try to derive counts from percentage if one side is known
   const percent = extractMetricValue(response);
   if (completed !== null && percent !== null && percent > 0) {
     const derivedAssigned = Math.round((completed / percent) * 100);
@@ -219,7 +216,6 @@ export function useTaskComplianceByUser(sprintId) {
               userId: user.id,
               label: buildUserName(user),
               value: complianceValue,
-              // Task counts — may be null if the API doesn't return them
               completed,
               assigned,
             };

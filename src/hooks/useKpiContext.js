@@ -14,13 +14,14 @@ const toNumberOrNull = (value) => {
 const getLatestSprint = (sprints) => {
   if (!Array.isArray(sprints) || sprints.length === 0) return null;
 
-  // Buscar Sprint 3 (id 3) por defecto
   const sprint3 = sprints.find((sprint) => Number(sprint?.id) === 3);
   if (sprint3) return sprint3;
 
   // Fallback por nombre si el backend no entrega id numérico consistente
   const sprint3ByName = sprints.find((sprint) => {
-    const name = String(sprint?.nombre ?? "").trim().toLowerCase();
+    const name = String(sprint?.nombre ?? "")
+      .trim()
+      .toLowerCase();
     return name === "sprint 3";
   });
   if (sprint3ByName) return sprint3ByName;
@@ -30,12 +31,10 @@ const getLatestSprint = (sprints) => {
     const leftId = Number(left?.id);
     const rightId = Number(right?.id);
 
-    // Both must be valid finite numbers (including 0)
     if (Number.isFinite(leftId) && Number.isFinite(rightId)) {
       return leftId - rightId;
     }
 
-    // If one is valid and the other isn't, prefer the valid one
     if (Number.isFinite(rightId)) return 1;
     if (Number.isFinite(leftId)) return -1;
 

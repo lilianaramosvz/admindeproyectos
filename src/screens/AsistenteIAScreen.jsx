@@ -58,7 +58,6 @@ export default function AsistenteIAScreen() {
   const { user } = useAuth();
   const { userId: ctxUserId, sprintId, loading: ctxLoading } = useKpiContext();
 
-  // user.id viene del JWT; ctxUserId es el fallback del contexto de KPIs
   const userId = user?.id ?? ctxUserId;
 
   const [messages, setMessages] = useState([WELCOME]);
@@ -108,7 +107,6 @@ export default function AsistenteIAScreen() {
     setIsTyping(true);
 
     try {
-      // POST /ai/chat?userId=X&sprintId=Y  con { message }
       const res = await chat(userId, sprintId, text);
       const aiText =
         extractText(res) ??

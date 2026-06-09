@@ -1,3 +1,4 @@
+//frontend\src\hooks\useSprintHistoryByUser.js
 import { useEffect, useState } from "react";
 import {
   getActiveSprints,
@@ -71,7 +72,10 @@ const extractRealHours = (response) => {
   if (!source || typeof source !== "object") return 0;
 
   const value =
-    source.actualValue ?? source.realHours ?? source.horasReales ?? source.value;
+    source.actualValue ??
+    source.realHours ??
+    source.horasReales ??
+    source.value;
 
   const numericValue = toNumber(value);
   return numericValue !== null ? numericValue : 0;
@@ -112,7 +116,9 @@ export function useSprintHistoryByUser(metric = "tasks") {
         ]);
 
         const activeUsers = Array.isArray(usersResponse) ? usersResponse : [];
-        const activeSprints = Array.isArray(sprintsResponse) ? sprintsResponse : [];
+        const activeSprints = Array.isArray(sprintsResponse)
+          ? sprintsResponse
+          : [];
 
         if (!activeUsers.length || !activeSprints.length) {
           if (!isActive) return;
@@ -148,7 +154,9 @@ export function useSprintHistoryByUser(metric = "tasks") {
           if (Number.isFinite(leftId) && Number.isFinite(rightId)) {
             return leftId - rightId;
           }
-          return String(left?.nombre ?? "").localeCompare(String(right?.nombre ?? ""));
+          return String(left?.nombre ?? "").localeCompare(
+            String(right?.nombre ?? ""),
+          );
         });
 
         const userHistory = await Promise.all(
@@ -156,10 +164,11 @@ export function useSprintHistoryByUser(metric = "tasks") {
             const perSprint = await Promise.all(
               sortedSprints.map(async (sprint) => {
                 const sprintId = sprint?.id;
-                const [durationResult, complianceResult] = await Promise.allSettled([
-                  getSprintDuration(user.id, sprintId),
-                  getSprintCompliance(user.id, sprintId),
-                ]);
+                const [durationResult, complianceResult] =
+                  await Promise.allSettled([
+                    getSprintDuration(user.id, sprintId),
+                    getSprintCompliance(user.id, sprintId),
+                  ]);
 
                 const realHours =
                   durationResult.status === "fulfilled"

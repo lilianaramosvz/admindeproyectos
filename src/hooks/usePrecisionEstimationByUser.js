@@ -74,7 +74,11 @@ const extractStatusMessage = (source) => {
   return String(rawStatus).trim();
 };
 
-const normalizeHoursByStatus = ({ estimatedHours, realHours, statusMessage }) => {
+const normalizeHoursByStatus = ({
+  estimatedHours,
+  realHours,
+  statusMessage,
+}) => {
   if (!Number.isFinite(estimatedHours) || !Number.isFinite(realHours)) {
     return { estimatedHours, realHours };
   }
@@ -83,9 +87,8 @@ const normalizeHoursByStatus = ({ estimatedHours, realHours, statusMessage }) =>
   const mentionsOverestimation = /sobreestima|sobreestimo|termina\s+antes/.test(
     status,
   );
-  const mentionsUnderestimation = /subestima|subestimo|termina\s+despues|termina\s+después/.test(
-    status,
-  );
+  const mentionsUnderestimation =
+    /subestima|subestimo|termina\s+despues|termina\s+después/.test(status);
 
   if (mentionsOverestimation && estimatedHours < realHours) {
     return { estimatedHours: realHours, realHours: estimatedHours };
@@ -259,16 +262,12 @@ export function usePrecisionEstimationByUser(sprintId) {
 
         setData(mapped);
         if (mapped.length === 0) {
-          setError(
-            "No hay datos de horas estimadas vs reales por usuario.",
-          );
+          setError("No hay datos de horas estimadas vs reales por usuario.");
         }
       } catch {
         if (!isActive) return;
         setData([]);
-        setError(
-          "No se pudo cargar la comparación de horas por usuario.",
-        );
+        setError("No se pudo cargar la comparación de horas por usuario.");
       } finally {
         if (isActive) setLoading(false);
       }

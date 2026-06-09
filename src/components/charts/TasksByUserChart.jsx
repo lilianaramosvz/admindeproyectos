@@ -86,9 +86,8 @@ export default function TasksByUserChart({ data = [], color = "green" }) {
     );
   }
 
-  // Filter out "Admin Sistema" user
   const filteredData = data.filter(
-    (item) => item?.label?.trim() !== "Admin Sistema"
+    (item) => item?.label?.trim() !== "Admin Sistema",
   );
 
   const chartData = filteredData
