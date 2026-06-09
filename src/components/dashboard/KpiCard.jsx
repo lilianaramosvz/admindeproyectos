@@ -12,7 +12,10 @@ export default function KpiCard({
 }) {
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const colorClass = styles[color] || "";
-  const infoText = String(statusMessage ?? "").trim() || String(change ?? "").trim() || "Sin detalles";
+  const infoText =
+    String(statusMessage ?? "").trim() ||
+    String(change ?? "").trim() ||
+    "Sin detalles";
 
   return (
     <div className={`${styles.card} ${colorClass}`}>
@@ -37,9 +40,7 @@ export default function KpiCard({
 
       {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
 
-      {isInfoOpen ? (
-        <div className={styles.infoPanel}>{infoText}</div>
-      ) : null}
+      {isInfoOpen ? <div className={styles.infoPanel}>{infoText}</div> : null}
     </div>
   );
 }

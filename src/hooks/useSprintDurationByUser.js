@@ -1,3 +1,4 @@
+//frontend\src\hooks\useSprintDurationByUser.js
 import { useEffect, useState } from "react";
 import { getActiveUsers, getSprintDuration } from "../services/api";
 
@@ -18,23 +19,23 @@ const buildUserName = (user) => {
 
 const extractRealHours = (response) => {
   if (!response || typeof response !== "object") return null;
-  
+
   const actualValue = response.actualValue;
   if (typeof actualValue === "number") {
     return actualValue;
   }
-  
+
   return null;
 };
 
 const extractPlannedHours = (response) => {
   if (!response || typeof response !== "object") return null;
-  
+
   const expectedValue = response.expectedValue;
   if (typeof expectedValue === "number") {
     return expectedValue;
   }
-  
+
   return null;
 };
 

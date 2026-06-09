@@ -1,12 +1,21 @@
+//frontend\src\components\backlog\BacklogPanel.jsx
 import { useMemo, useState } from "react";
 import styles from "../../styles/components/backlog/BacklogTable.module.css";
 import Avatar from "../ui/Avatar";
 import Complexity from "../ui/Complexity";
 import Badge from "../ui/Badge";
-import { Search, Filter, X, Calendar, Clock, CheckCircle2, Circle, Timer } from "lucide-react";
+import {
+  Search,
+  Filter,
+  X,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  Circle,
+  Timer,
+} from "lucide-react";
 import { useBacklogTasks } from "../../hooks/useBacklogTasks";
 import taskStyles from "../../styles/screens/TasksScreen.module.css";
-
 
 function formatDate(dateStr) {
   if (!dateStr) return null;
@@ -36,9 +45,13 @@ export default function BacklogPanel() {
   const filteredTasks = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
     return tasks.filter((task) => {
-      const matchesSprint = selectedSprint === "todos" || task.sprint === selectedSprint;
-      const matchesSearch = !term || [task.title, task.id, task.name, task.sprint, task.status]
-        .some((v) => v?.toLowerCase().includes(term));
+      const matchesSprint =
+        selectedSprint === "todos" || task.sprint === selectedSprint;
+      const matchesSearch =
+        !term ||
+        [task.title, task.id, task.name, task.sprint, task.status].some((v) =>
+          v?.toLowerCase().includes(term),
+        );
       return matchesSprint && matchesSearch;
     });
   }, [searchTerm, selectedSprint, tasks]);
@@ -67,16 +80,30 @@ export default function BacklogPanel() {
         {showFilter && (
           <div className={styles.filterDropdown}>
             <button
-              className={selectedSprint === "todos" ? styles.filterOptionActive : styles.filterOption}
-              onClick={() => { setSelectedSprint("todos"); setShowFilter(false); }}
+              className={
+                selectedSprint === "todos"
+                  ? styles.filterOptionActive
+                  : styles.filterOption
+              }
+              onClick={() => {
+                setSelectedSprint("todos");
+                setShowFilter(false);
+              }}
             >
               Todos los sprints
             </button>
             {availableSprints.map((sprint) => (
               <button
                 key={sprint}
-                className={selectedSprint === sprint ? styles.filterOptionActive : styles.filterOption}
-                onClick={() => { setSelectedSprint(sprint); setShowFilter(false); }}
+                className={
+                  selectedSprint === sprint
+                    ? styles.filterOptionActive
+                    : styles.filterOption
+                }
+                onClick={() => {
+                  setSelectedSprint(sprint);
+                  setShowFilter(false);
+                }}
               >
                 {sprint}
               </button>
@@ -96,32 +123,36 @@ export default function BacklogPanel() {
             <div>SPRINT</div>
           </div>
 
-          {loading && <div className={styles.noResults}>Cargando tareas...</div>}
+          {loading && (
+            <div className={styles.noResults}>Cargando tareas...</div>
+          )}
           {!loading && error && <div className={styles.noResults}>{error}</div>}
 
-          {!loading && !error && filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              className={styles.row}
-              onClick={() => setSelectedTask(task)}
-              style={{ cursor: "pointer" }}
-            >
-              <div>
-                <strong>{task.title}</strong>
-                <p>{task.id}</p>
+          {!loading &&
+            !error &&
+            filteredTasks.map((task) => (
+              <div
+                key={task.id}
+                className={styles.row}
+                onClick={() => setSelectedTask(task)}
+                style={{ cursor: "pointer" }}
+              >
+                <div>
+                  <strong>{task.title}</strong>
+                  <p>{task.id}</p>
+                </div>
+                <div>
+                  <Badge type={task.status}>{task.status}</Badge>
+                </div>
+                <Complexity level={task.complexity} />
+                <div>{task.hours}</div>
+                <div className={styles.assignee}>
+                  <Avatar initials={task.assignee} />
+                  {task.name}
+                </div>
+                <div>{task.sprint}</div>
               </div>
-              <div>
-                <Badge type={task.status}>{task.status}</Badge>
-              </div>
-              <Complexity level={task.complexity} />
-              <div>{task.hours}</div>
-              <div className={styles.assignee}>
-                <Avatar initials={task.assignee} />
-                {task.name}
-              </div>
-              <div>{task.sprint}</div>
-            </div>
-          ))}
+            ))}
 
           {!loading && !error && filteredTasks.length === 0 && (
             <div className={styles.noResults}>No se encontraron tareas.</div>
@@ -131,66 +162,91 @@ export default function BacklogPanel() {
 
       {/* Modal detalle tarea */}
       {selectedTask && (
-  <div className={taskStyles.modalOverlay} onClick={() => setSelectedTask(null)}>
-    <div
-      className={taskStyles.modalCard}
-      onClick={(e) => e.stopPropagation()}
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className={taskStyles.modalHeader}>
-        <h2 className={taskStyles.modalTitle}>{selectedTask.title}</h2>
-        <button
-          className={taskStyles.closeBtn}
+        <div
+          className={taskStyles.modalOverlay}
           onClick={() => setSelectedTask(null)}
-          aria-label="Cerrar"
         >
-          <X size={20} />
-        </button>
-      </div>
+          <div
+            className={taskStyles.modalCard}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className={taskStyles.modalHeader}>
+              <h2 className={taskStyles.modalTitle}>{selectedTask.title}</h2>
+              <button
+                className={taskStyles.closeBtn}
+                onClick={() => setSelectedTask(null)}
+                aria-label="Cerrar"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-      <div className={taskStyles.modalBody}>
-        <p className={taskStyles.modalId}>{selectedTask.id}</p>
+            <div className={taskStyles.modalBody}>
+              <p className={taskStyles.modalId}>{selectedTask.id}</p>
 
-        <div className={taskStyles.modalMetaItem}>
-          {selectedTask.status === "completada" && <CheckCircle2 size={15} color="var(--green)" />}
-          {selectedTask.status === "en progreso" && <Timer size={15} color="var(--blue)" />}
-          {selectedTask.status === "pendiente" && <Circle size={15} color="var(--text-tertiary)" />}
-          <span style={{ fontSize: "13px", textTransform: "capitalize", color: "var(--text-secondary)" }}>
-            {selectedTask.status}
-          </span>
+              <div className={taskStyles.modalMetaItem}>
+                {selectedTask.status === "completada" && (
+                  <CheckCircle2 size={15} color="var(--green)" />
+                )}
+                {selectedTask.status === "en progreso" && (
+                  <Timer size={15} color="var(--blue)" />
+                )}
+                {selectedTask.status === "pendiente" && (
+                  <Circle size={15} color="var(--text-tertiary)" />
+                )}
+                <span
+                  style={{
+                    fontSize: "13px",
+                    textTransform: "capitalize",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  {selectedTask.status}
+                </span>
+              </div>
+
+              {selectedTask.description ? (
+                <p className={taskStyles.modalDesc}>
+                  {selectedTask.description}
+                </p>
+              ) : (
+                <p
+                  className={taskStyles.modalDesc}
+                  style={{ fontStyle: "italic", color: "var(--text-tertiary)" }}
+                >
+                  Sin descripción.
+                </p>
+              )}
+
+              <div className={taskStyles.modalMeta}>
+                {selectedTask.fechaFin && (
+                  <div className={taskStyles.modalMetaItem}>
+                    <Calendar size={14} />
+                    <span>
+                      Fecha de entrega: {formatDate(selectedTask.fechaFin)}
+                    </span>
+                  </div>
+                )}
+                {selectedTask.hours && (
+                  <div className={taskStyles.modalMetaItem}>
+                    <Clock size={14} />
+                    <span>Horas estimadas: {selectedTask.hours}</span>
+                  </div>
+                )}
+                {selectedTask.status === "completada" &&
+                  selectedTask.tiempoReal != null && (
+                    <div className={taskStyles.modalMetaItem}>
+                      <Clock size={14} />
+                      <span>Horas reales: {selectedTask.tiempoReal}h</span>
+                    </div>
+                  )}
+              </div>
+            </div>
+          </div>
         </div>
-
-        {selectedTask.description
-          ? <p className={taskStyles.modalDesc}>{selectedTask.description}</p>
-          : <p className={taskStyles.modalDesc} style={{ fontStyle: "italic", color: "var(--text-tertiary)" }}>Sin descripción.</p>
-        }
-
-        <div className={taskStyles.modalMeta}>
-          
-          {selectedTask.fechaFin && (
-            <div className={taskStyles.modalMetaItem}>
-              <Calendar size={14} />
-              <span>Fecha de entrega: {formatDate(selectedTask.fechaFin)}</span>
-            </div>
-          )}
-          {selectedTask.hours && (
-            <div className={taskStyles.modalMetaItem}>
-              <Clock size={14} />
-              <span>Horas estimadas: {selectedTask.hours}</span>
-            </div>
-          )}
-          {selectedTask.status === "completada" && selectedTask.tiempoReal != null && (
-            <div className={taskStyles.modalMetaItem}>
-              <Clock size={14} />
-              <span>Horas reales: {selectedTask.tiempoReal}h</span>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }

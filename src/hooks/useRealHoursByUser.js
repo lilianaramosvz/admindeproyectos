@@ -1,3 +1,4 @@
+//frontend\src\hooks\useRealHoursByUser.js
 import { useEffect, useState } from "react";
 import { getActiveUsers, getSprintDuration } from "../services/api";
 
@@ -16,17 +17,13 @@ const buildUserName = (user) => {
   );
 };
 
-// El endpoint getSprintDuration devuelve actualValue = horas reales
-// igual que en useSprintDurationByUser
+// El endpoint getSprintDuration devuelve actualValue = horas reales igual que en useSprintDurationByUser
 const extractRealHours = (response) => {
   if (!response || typeof response !== "object") return null;
 
   // Intentar múltiples campos por si el backend varía
   const value =
-    response.actualValue ??
-    response.realHours ??
-    response.horasReales ??
-    null;
+    response.actualValue ?? response.realHours ?? response.horasReales ?? null;
 
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
@@ -37,14 +34,25 @@ const extractRealHours = (response) => {
 
 const isWorkerUser = (user) => {
   const roleValue =
-    user?.id_rol ?? user?.rol ?? user?.role ?? user?.idRol ?? user?.tipoRol ?? null;
+    user?.id_rol ??
+    user?.rol ??
+    user?.role ??
+    user?.idRol ??
+    user?.tipoRol ??
+    null;
 
   if (Number(roleValue) === 2) {
     return true;
   }
 
-  const normalizedRole = String(roleValue ?? "").trim().toLowerCase();
-  if (["2", "worker", "developer", "desarrollador", "dev"].includes(normalizedRole)) {
+  const normalizedRole = String(roleValue ?? "")
+    .trim()
+    .toLowerCase();
+  if (
+    ["2", "worker", "developer", "desarrollador", "dev"].includes(
+      normalizedRole,
+    )
+  ) {
     return true;
   }
 
@@ -70,7 +78,9 @@ export function useRealHoursByUser(sprintId) {
         setData([]);
         setTotalRealHours(0);
         setLoading(false);
-        setError("No hay sprint activo para calcular horas reales por usuario.");
+        setError(
+          "No hay sprint activo para calcular horas reales por usuario.",
+        );
         return;
       }
 
@@ -125,7 +135,9 @@ export function useRealHoursByUser(sprintId) {
           .sort((a, b) => b.realHours - a.realHours);
 
         setData(mapped);
-        setTotalRealHours(mapped.reduce((acc, item) => acc + item.realHours, 0));
+        setTotalRealHours(
+          mapped.reduce((acc, item) => acc + item.realHours, 0),
+        );
 
         if (mapped.length === 0) {
           setTotalRealHours(0);

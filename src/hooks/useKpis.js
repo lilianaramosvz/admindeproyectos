@@ -1,3 +1,4 @@
+//frontend\src\hooks\useKpis.js
 import { useEffect, useState } from "react";
 import {
   getProjectCycleTime,
@@ -35,7 +36,13 @@ const KPI_DEFINITIONS = [
     color: "purple",
     scope: "sprint",
     unit: "hrs",
-    aliases: ["horas reales", "realhours", "horasreales", "real hours", "horas trabajadas"],
+    aliases: [
+      "horas reales",
+      "realhours",
+      "horasreales",
+      "real hours",
+      "horas trabajadas",
+    ],
     valueFields: [
       "actualValue",
       "realHours",
@@ -797,8 +804,16 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
 
           const durationChartData = durationComparison
             ? [
-                { value: durationComparison.real, label: "Tiempo real", date: null },
-                { value: durationComparison.planned, label: "Tiempo planificado", date: null },
+                {
+                  value: durationComparison.real,
+                  label: "Tiempo real",
+                  date: null,
+                },
+                {
+                  value: durationComparison.planned,
+                  label: "Tiempo planificado",
+                  date: null,
+                },
               ]
             : null;
 
@@ -808,27 +823,42 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
 
           const cycleTimeChartData = cycleTimeComparison
             ? [
-                { value: cycleTimeComparison.expected, label: "Tiempo esperado", date: null },
-                { value: cycleTimeComparison.actual, label: "Tiempo real", date: null },
+                {
+                  value: cycleTimeComparison.expected,
+                  label: "Tiempo esperado",
+                  date: null,
+                },
+                {
+                  value: cycleTimeComparison.actual,
+                  label: "Tiempo real",
+                  date: null,
+                },
               ]
             : null;
 
           const displayValue =
             metric.key === "duration" && durationComparison
               ? (() => {
-                  const durationPercent = normalizeMetricValue(currentValue, { ...metric, unit: "%" });
+                  const durationPercent = normalizeMetricValue(currentValue, {
+                    ...metric,
+                    unit: "%",
+                  });
                   if (durationPercent === null) return "Sin datos";
                   return `${durationPercent.toFixed(2)}%`;
                 })()
               : metric.key === "cycleTime"
                 ? (() => {
-                    const cyclePercent = normalizeMetricValue(currentValue, { ...metric, unit: "%" });
+                    const cyclePercent = normalizeMetricValue(currentValue, {
+                      ...metric,
+                      unit: "%",
+                    });
                     if (cyclePercent === null) return "Sin datos";
                     return `${cyclePercent.toFixed(1)}%`;
                   })()
                 : formatMetricValue(currentValue, metric);
 
-          const displayChartData = durationChartData ?? cycleTimeChartData ?? chartData;
+          const displayChartData =
+            durationChartData ?? cycleTimeChartData ?? chartData;
           const displayUnit =
             metric.key === "duration" && durationComparison
               ? durationComparison.unit
@@ -836,7 +866,9 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
                 ? cycleTimeComparison.unit
                 : metric.unit;
           const displayHasHistory =
-            durationChartData || cycleTimeChartData ? false : chartMeta.hasHistory;
+            durationChartData || cycleTimeChartData
+              ? false
+              : chartMeta.hasHistory;
 
           return {
             key: metric.key,
@@ -858,7 +890,9 @@ export function useKpis({ userId, projectId, sprintId = projectId }) {
         setKpis(mapped);
 
         if (resolvedMetrics.some((result) => result?.status === "rejected")) {
-          console.warn("No se pudieron cargar todos los KPI. Se muestran los datos disponibles.");
+          console.warn(
+            "No se pudieron cargar todos los KPI. Se muestran los datos disponibles.",
+          );
         }
       } catch (err) {
         console.error(err);

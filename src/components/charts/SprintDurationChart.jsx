@@ -1,4 +1,5 @@
-import React from 'react';
+//frontend\src\components\charts\SprintDurationChart.jsx
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -7,9 +8,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-} from 'recharts';
-import { useSprintDurationByUser } from '../../hooks/useSprintDurationByUser';
-import styles from '../../styles/components/charts/SprintDurationChart.module.css';
+} from "recharts";
+import { useSprintDurationByUser } from "../../hooks/useSprintDurationByUser";
+import styles from "../../styles/components/charts/SprintDurationChart.module.css";
 
 const COLOR_MAP = {
   blue: "var(--blue)",
@@ -78,9 +79,7 @@ function DurationTooltip({ active, payload }) {
   const point = payload[0]?.payload;
   if (!point) return null;
 
-  const plannedValue = payload.find(
-    (item) => item.dataKey === "plannedHours",
-  );
+  const plannedValue = payload.find((item) => item.dataKey === "plannedHours");
   const realValue = payload.find((item) => item.dataKey === "realHours");
   const unit = point.unit || "hrs";
   const deltaInfo = getDeltaInfo(point.plannedHours, point.realHours);
@@ -102,8 +101,12 @@ function DurationTooltip({ active, payload }) {
 }
 
 const SprintDurationChart = ({ sprintId, color = "blue" }) => {
-  const { data: apiData, loading, error } = useSprintDurationByUser(
-    sprintId !== null && sprintId !== undefined ? sprintId : null
+  const {
+    data: apiData,
+    loading,
+    error,
+  } = useSprintDurationByUser(
+    sprintId !== null && sprintId !== undefined ? sprintId : null,
   );
 
   const primaryColor = COLOR_MAP[color] || COLOR_MAP.blue;

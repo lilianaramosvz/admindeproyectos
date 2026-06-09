@@ -8,7 +8,9 @@ export function SelectionProvider({ children }) {
   const [sprintName, setSprintName] = useState("");
 
   return (
-    <SelectionContext.Provider value={{ sprintId, setSprintId, sprintName, setSprintName }}>
+    <SelectionContext.Provider
+      value={{ sprintId, setSprintId, sprintName, setSprintName }}
+    >
       {children}
     </SelectionContext.Provider>
   );

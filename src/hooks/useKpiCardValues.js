@@ -31,7 +31,7 @@ export function useKpiCardValues({
     if (!complianceByUser || complianceByUser.length === 0) {
       return 0;
     }
-    
+
     return complianceByUser.reduce((acc, item) => {
       const completed = Number(item?.completed);
       return Number.isFinite(completed) ? acc + completed : acc;

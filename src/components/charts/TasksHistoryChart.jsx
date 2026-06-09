@@ -1,3 +1,4 @@
+//frontend\src\components\charts\TasksHistoryChart.jsx
 import React from "react";
 import {
   Bar,
@@ -68,7 +69,6 @@ export default function TasksHistoryChart() {
     );
   }
 
-  // Mostrar Sprint 0-3 (incluye Sprint con id 3)
   const filteredSprints = sprints.filter((s) => {
     const sprintId = Number(s.sprintId);
     return Number.isFinite(sprintId) && VISIBLE_SPRINT_IDS.includes(sprintId);
@@ -86,7 +86,9 @@ export default function TasksHistoryChart() {
 
   return (
     <div className={styles.root}>
-      <div className={styles.totalLabel}>{Math.round(totalTasks)} tareas totales</div>
+      <div className={styles.totalLabel}>
+        {Math.round(totalTasks)} tareas totales
+      </div>
 
       <div className={styles.chartWrapper}>
         <ResponsiveContainer width="100%" height="100%">
@@ -131,7 +133,7 @@ export default function TasksHistoryChart() {
         </ResponsiveContainer>
       </div>
 
-      {/*  Leyenda con círculo de color + nombre */}
+      {/*  Leyenda con círculo de color y nombre */}
       <div className={styles.legend}>
         {users.map((userName, index) => (
           <div key={userName} className={styles.legendItem}>
