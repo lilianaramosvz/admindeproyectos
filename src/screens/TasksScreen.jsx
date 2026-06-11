@@ -15,6 +15,7 @@ import {
   getActiveProjects,
   getSprintsByProject,
   updateTaskStatus,
+  updateRealHours,
 } from "../services/api";
 import styles from "../styles/screens/TasksScreen.module.css";
 
@@ -53,6 +54,7 @@ export default function TasksScreen() {
   const [editingStatus, setEditingStatus] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [horasReales, setHorasReales] = useState("");
 
   const [availableProjects, setAvailableProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -172,6 +174,7 @@ export default function TasksScreen() {
     setSelectedTask(task);
     setEditingStatus(task.idEstado);
     setSaveError(null);
+    setHorasReales("");
   };
 
   const closeModal = () => {
@@ -179,6 +182,7 @@ export default function TasksScreen() {
     setSelectedTask(null);
     setEditingStatus(null);
     setSaveError(null);
+    setHorasReales("");
   };
 
   const handleSaveStatus = async () => {
@@ -186,7 +190,10 @@ export default function TasksScreen() {
     setSaving(true);
     setSaveError(null);
     try {
-      await updateTaskStatus(selectedTask.idTarea, { idEstado: editingStatus });
+      await updateTaskStatus(selectedTask.idTarea, editingStatus);
+      if (editingStatus === 3 && horasReales !== "") {
+        await updateRealHours(selectedTask.idTarea, parseFloat(horasReales));
+      }
       setTasks((prev) =>
         prev.map((t) =>
           t.idTarea === selectedTask.idTarea
@@ -196,8 +203,10 @@ export default function TasksScreen() {
       );
       setSelectedTask(null);
       setEditingStatus(null);
-    } catch {
-      setSaveError("No se pudo actualizar el estado. Intenta de nuevo.");
+      setHorasReales("");
+    } catch (err) {
+      console.error("[handleSaveStatus] error:", err);
+      setSaveError(`Error: ${err?.message ?? "desconocido"}`);
     } finally {
       setSaving(false);
     }
@@ -467,6 +476,12 @@ export default function TasksScreen() {
                       </span>
                     </div>
                   )}
+                  {selectedTask.tiempoReal != null && (
+                    <div className={styles.modalMetaItem}>
+                      <Clock size={14} />
+                      <span>Horas reales: {selectedTask.tiempoReal}h</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className={styles.statusSection}>
@@ -482,7 +497,10 @@ export default function TasksScreen() {
                           key={col.id}
                           type="button"
                           className={`${styles.statusBtn} ${editingStatus === col.id ? styles[col.colorClass + "Active"] : ""}`}
-                          onClick={() => setEditingStatus(col.id)}
+                          onClick={() => {
+                            setEditingStatus(col.id);
+                            if (col.id !== 3) setHorasReales("");
+                          }}
                           disabled={saving}
                         >
                           <span
@@ -494,6 +512,25 @@ export default function TasksScreen() {
                     </div>
                   )}
                 </div>
+
+                {editingStatus === 3 && selectedTask.idEstado !== 3 && (
+                  <div className={styles.horasSection}>
+                    <label className={styles.horasLabel} htmlFor="horas-reales">
+                      ¿Cuántas horas tardaste en completar esta tarea?
+                    </label>
+                    <input
+                      id="horas-reales"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      className={styles.horasInput}
+                      value={horasReales}
+                      onChange={(e) => setHorasReales(e.target.value)}
+                      placeholder="ej. 3.5"
+                      disabled={saving}
+                    />
+                  </div>
+                )}
 
                 {saveError && <p className={styles.saveError}>{saveError}</p>}
               </div>
@@ -512,7 +549,8 @@ export default function TasksScreen() {
                   disabled={
                     saving ||
                     editingStatus === selectedTask.idEstado ||
-                    selectedTask.idEstado === 3
+                    selectedTask.idEstado === 3 ||
+                    (editingStatus === 3 && horasReales === "")
                   }
                 >
                   {saving ? "Guardando..." : "Guardar cambios"}

@@ -17,6 +17,33 @@ const buildUserName = (user) => {
   );
 };
 
+const isAdminUser = (user) => {
+  const fullName = buildUserName(user);
+  const normalizedName = String(fullName ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (normalizedName === "admin sistema" || normalizedName === "admin") {
+    return true;
+  }
+
+  const roleValue =
+    user?.id_rol ??
+    user?.rol ??
+    user?.role ??
+    user?.idRol ??
+    user?.tipoRol ??
+    null;
+
+  const normalizedRole = String(roleValue ?? "")
+    .trim()
+    .toLowerCase();
+
+  return ["1", "admin", "administrator", "administrador"].includes(
+    normalizedRole,
+  );
+};
+
 const extractRealHours = (response) => {
   if (!response || typeof response !== "object") return null;
 
@@ -68,13 +95,15 @@ export function useSprintDurationByUser(sprintId) {
           return;
         }
 
+        const filteredUsers = users.filter((user) => !isAdminUser(user));
+
         const durationResults = await Promise.allSettled(
-          users.map((user) => getSprintDuration(user.id, sprintId)),
+          filteredUsers.map((user) => getSprintDuration(user.id, sprintId)),
         );
 
         if (!isActive) return;
 
-        const mapped = users
+        const mapped = filteredUsers
           .map((user, index) => {
             const result = durationResults[index];
             if (result?.status !== "fulfilled" || !result.value) return null;

@@ -2,7 +2,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(to bottom, #ec4ef8, #724ad0, #3b82f6);
+  background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
   display: flex;
   align-items: center;
   justify-content: center;

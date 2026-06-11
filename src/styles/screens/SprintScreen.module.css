@@ -641,6 +641,43 @@
   margin: 0;
 }
 
+.horasSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  background: var(--green-chart-soft);
+  border: 1px solid var(--green);
+  border-radius: 10px;
+}
+
+.horasLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.horasInput {
+  padding: 8px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  width: 140px;
+  transition: border-color 0.15s ease;
+}
+
+.horasInput:focus {
+  border-color: var(--green);
+}
+
+.horasInput:disabled {
+  opacity: 0.5;
+}
+
 .completedNotice {
   background: var(--green-chart-soft);
   border: 1px solid var(--green);
