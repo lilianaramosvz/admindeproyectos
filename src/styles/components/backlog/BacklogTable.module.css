@@ -51,28 +51,37 @@
 .filterDropdown {
   position: absolute;
   top: calc(100% + 6px);
-  right: 12px; /* 👈 se alinea al botón filtrar */
+  right: 0;
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 10px;
-  padding: 6px;
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   z-index: 100;
-  min-width: 160px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 200px;
+  padding: 8px;
 }
 
 .filterOption {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
+  align-items: center;
   background: transparent;
-  color: var(--text-primary);
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 999px;
+  color: var(--text-secondary);
   cursor: pointer;
-  text-align: left;
+  display: flex;
+  font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 7px 10px;
+  text-align: left;
+  transition: background-color 0.2s ease;
+  width: 100%;
 }
 
 .filterOption:hover {
@@ -80,15 +89,37 @@
 }
 
 .filterOptionActive {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
+  align-items: center;
   background: var(--bg-secondary);
+  border: none;
+  border-left: 3px solid var(--blue);
+  border-radius: 999px;
   color: var(--text-primary);
   cursor: pointer;
-  text-align: left;
+  display: flex;
+  font-family: inherit;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 7px 10px;
+  text-align: left;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.filterOptionLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filterOptionCheck {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 16px;
+  text-align: center;
 }
 
 .wrapper {
@@ -108,10 +139,20 @@
   letter-spacing: 0.5px;
   padding: 12px 20px;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 0.85fr 2fr 1fr;
   align-items: center;
   background: var(--bg-tertiary);
   border: none;
+}
+
+.header > :nth-child(6),
+.row > :nth-child(6) {
+  padding-left: 10px;
+}
+
+.header > :first-child,
+.row > :first-child {
+  padding-left: 10px;
 }
 
 .row {
@@ -121,7 +162,7 @@
   background: transparent;
   padding: 16px 20px;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 0.85fr 2fr 1fr;
   align-items: center;
   min-height: 48px;
   transition:
@@ -145,6 +186,16 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.assigneeName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  flex: 1;
 }
 
 .dot {

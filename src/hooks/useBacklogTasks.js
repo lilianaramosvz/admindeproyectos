@@ -13,6 +13,12 @@ const normalizePriority = (id) => {
   return "medium";
 };
 
+const normalizeStatus = (idEstado) => {
+  if (idEstado === 2) return "en progreso";
+  if (idEstado === 3) return "completada";
+  return "pendiente";
+};
+
 const buildAssigneeName = (user) => {
   if (!user) return "Equipo";
   return (
@@ -38,6 +44,7 @@ const normalizeTask = (task, sprintName, taskOwnerMap) => {
     id: task.idTarea ? `TSK-${task.idTarea}` : "TSK-?",
     title: task.titulo ?? "Sin título",
     description: task.descripcion ?? null,
+    status: normalizeStatus(task.idEstado),
     priority: normalizePriority(task.idPrioridad),
     complexity: Math.min(Math.max(Number(task.complejidad) || 1, 1), 5),
     hours: task.tiempoEstimado != null ? `${task.tiempoEstimado}h` : "—",

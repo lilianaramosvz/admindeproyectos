@@ -21,18 +21,6 @@ export default function KpiCard({
     <div className={`${styles.card} ${colorClass}`}>
       <div className={styles.top}>
         <div className={styles.icon}></div>
-        <div className={styles.actions}>
-          <span className={styles.badge}>{change}</span>
-          <button
-            type="button"
-            className={styles.infoButton}
-            onClick={() => setIsInfoOpen((open) => !open)}
-            aria-expanded={isInfoOpen}
-            aria-label={`Mostrar mas informacion de ${title}`}
-          >
-            {isInfoOpen ? "-" : "+"}
-          </button>
-        </div>
       </div>
 
       <h2 className={styles.title}>{value}</h2>

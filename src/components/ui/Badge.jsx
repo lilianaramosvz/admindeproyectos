@@ -10,12 +10,18 @@ export default function Badge({ type, children }) {
       medium: "medium",
       baja: "low",
       low: "low",
+      pendiente: "pendiente",
+      "en progreso": "inProgress",
+      completada: "completada",
     }[(type || "").toLowerCase()] || "low";
 
   const label = {
     high: "alta",
     medium: "media",
     low: "baja",
+    pendiente: "Pendiente",
+    inProgress: "En Progreso",
+    completada: "Completada",
   }[normalizedType];
 
   return (

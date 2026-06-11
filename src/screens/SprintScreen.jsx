@@ -1,12 +1,15 @@
 //frontend\src\screens\SprintScreen.jsx
 import { useEffect, useRef, useState } from "react";
 import MainLayout from "../components/layout/MainLayout";
-import { Calendar, Clock, X } from "lucide-react";
+import { Calendar, Clock, User, X } from "lucide-react";
 import {
   getActiveProjects,
+  getActiveUsers,
   getSprintsByProject,
   getTasksBySprint,
+  getTasksByUser,
   updateTaskStatus,
+  updateRealHours,
 } from "../services/api";
 import { useSelection } from "../context/SelectionContext";
 import styles from "../styles/screens/SprintScreen.module.css";
@@ -39,6 +42,8 @@ export default function SprintScreen() {
   const [editingStatus, setEditingStatus] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [horasReales, setHorasReales] = useState("");
+  const [taskOwnerMap, setTaskOwnerMap] = useState({});
   const { setSprintId: setSharedSprintId, setSprintName: setSharedSprintName } =
     useSelection();
   const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
@@ -54,7 +59,13 @@ export default function SprintScreen() {
         if (!isMounted) return;
         const list = Array.isArray(data) ? data : [];
         setProjects(list);
-        if (list.length > 0) setSelectedProjectId(list[0].id);
+        if (list.length > 0) {
+          const savedId = Number(sessionStorage.getItem("selectedProjectId"));
+          const match = savedId && list.find((p) => p.id === savedId);
+          const chosenId = match ? savedId : list[0].id;
+          setSelectedProjectId(chosenId);
+          sessionStorage.setItem("selectedProjectId", chosenId);
+        }
       })
       .catch(() => {
         if (isMounted) setProjects([]);
@@ -80,7 +91,21 @@ export default function SprintScreen() {
         if (!isMounted) return;
         const list = Array.isArray(data) ? data : [];
         setSprints(list);
-        if (list.length > 0) setSelectedSprintId(list[0].idSprint);
+        if (list.length > 0) {
+          const savedProjectId = Number(
+            sessionStorage.getItem("selectedProjectId"),
+          );
+          const savedSprintId = Number(
+            sessionStorage.getItem("selectedSprintId"),
+          );
+          const canRestore =
+            savedProjectId === selectedProjectId &&
+            savedSprintId &&
+            list.find((s) => s.idSprint === savedSprintId);
+          const chosenSprintId = canRestore ? savedSprintId : list[0].idSprint;
+          setSelectedSprintId(chosenSprintId);
+          sessionStorage.setItem("selectedSprintId", chosenSprintId);
+        }
       })
       .catch(() => {
         if (isMounted) setSprints([]);
@@ -98,10 +123,38 @@ export default function SprintScreen() {
     let isMounted = true;
     setLoadingTasks(true);
     setTasks([]);
-    getTasksBySprint(selectedSprintId)
-      .then((data) => {
+    Promise.all([
+      getTasksBySprint(selectedSprintId),
+      getActiveUsers().then((users) =>
+        Promise.allSettled(
+          (Array.isArray(users) ? users : []).map((u) =>
+            getTasksByUser(u.id).then((tasks) => ({
+              user: u,
+              tasks: tasks ?? [],
+            })),
+          ),
+        ),
+      ),
+    ])
+      .then(([taskData, userTaskResults]) => {
         if (!isMounted) return;
-        setTasks(Array.isArray(data) ? data : []);
+        setTasks(Array.isArray(taskData) ? taskData : []);
+        const ownerMap = {};
+        userTaskResults
+          .filter((r) => r.status === "fulfilled")
+          .forEach(({ value: { user, tasks } }) => {
+            const name =
+              [user.nombre, user.apellidoPaterno, user.apellidoMaterno]
+                .filter(Boolean)
+                .join(" ") ||
+              user.name ||
+              user.email ||
+              "Equipo";
+            tasks.forEach((t) => {
+              ownerMap[t.idTarea] = name;
+            });
+          });
+        setTaskOwnerMap(ownerMap);
       })
       .catch(() => {
         if (isMounted) setTasks([]);
@@ -165,6 +218,7 @@ export default function SprintScreen() {
     setSelectedTask(task);
     setEditingStatus(task.idEstado);
     setSaveError(null);
+    setHorasReales("");
   };
 
   const closeModal = () => {
@@ -172,6 +226,7 @@ export default function SprintScreen() {
     setSelectedTask(null);
     setEditingStatus(null);
     setSaveError(null);
+    setHorasReales("");
   };
 
   const handleSaveStatus = async () => {
@@ -179,7 +234,10 @@ export default function SprintScreen() {
     setSaving(true);
     setSaveError(null);
     try {
-      await updateTaskStatus(selectedTask.idTarea, { idEstado: editingStatus });
+      await updateTaskStatus(selectedTask.idTarea, editingStatus);
+      if (editingStatus === 3 && horasReales !== "") {
+        await updateRealHours(selectedTask.idTarea, parseFloat(horasReales));
+      }
       setTasks((prev) =>
         prev.map((t) =>
           t.idTarea === selectedTask.idTarea
@@ -187,11 +245,12 @@ export default function SprintScreen() {
             : t,
         ),
       );
-
       setSelectedTask(null);
       setEditingStatus(null);
-    } catch {
-      setSaveError("No se pudo actualizar el estado. Intenta de nuevo.");
+      setHorasReales("");
+    } catch (err) {
+      console.error("[handleSaveStatus] error:", err);
+      setSaveError(`Error: ${err?.message ?? "desconocido"}`);
     } finally {
       setSaving(false);
     }
@@ -201,9 +260,9 @@ export default function SprintScreen() {
     <MainLayout title="Sprint">
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1>Sprint</h1>
+          <h1>Tareas por Sprint</h1>
           <p className={styles.intro}>
-            ¡Bienvenido! Esta es la vista general del progreso de tu equipo.
+            Esta es la vista general del progreso de tareas de tu equipo.
           </p>
         </div>
 
@@ -249,7 +308,10 @@ export default function SprintScreen() {
                         aria-selected={isSelected}
                         className={`${styles.sprintOption} ${isSelected ? styles.sprintOptionSelected : ""}`}
                         onClick={() => {
-                          setSelectedProjectId(Number(p.id));
+                          const id = Number(p.id);
+                          setSelectedProjectId(id);
+                          sessionStorage.setItem("selectedProjectId", id);
+                          sessionStorage.removeItem("selectedSprintId");
                           setIsProjectMenuOpen(false);
                         }}
                       >
@@ -312,6 +374,10 @@ export default function SprintScreen() {
                         className={`${styles.sprintOption} ${isSelected ? styles.sprintOptionSelected : ""}`}
                         onClick={() => {
                           setSelectedSprintId(s.idSprint);
+                          sessionStorage.setItem(
+                            "selectedSprintId",
+                            s.idSprint,
+                          );
                           setSharedSprintId(s.idSprint);
                           setSharedSprintName(s.nombre);
                           setIsSprintMenuOpen(false);
@@ -482,6 +548,20 @@ export default function SprintScreen() {
                       </span>
                     </div>
                   )}
+                  {selectedTask.tiempoReal != null && (
+                    <div className={styles.modalMetaItem}>
+                      <Clock size={14} />
+                      <span>Horas reales: {selectedTask.tiempoReal}h</span>
+                    </div>
+                  )}
+                  {taskOwnerMap[selectedTask.idTarea] && (
+                    <div className={styles.modalMetaItem}>
+                      <User size={14} />
+                      <span>
+                        Responsable: {taskOwnerMap[selectedTask.idTarea]}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className={styles.statusSection}>
@@ -497,7 +577,10 @@ export default function SprintScreen() {
                           key={col.id}
                           type="button"
                           className={`${styles.statusBtn} ${editingStatus === col.id ? styles[col.colorClass + "Active"] : ""}`}
-                          onClick={() => setEditingStatus(col.id)}
+                          onClick={() => {
+                            setEditingStatus(col.id);
+                            if (col.id !== 3) setHorasReales("");
+                          }}
                           disabled={saving}
                         >
                           <span
@@ -509,6 +592,25 @@ export default function SprintScreen() {
                     </div>
                   )}
                 </div>
+
+                {editingStatus === 3 && selectedTask.idEstado !== 3 && (
+                  <div className={styles.horasSection}>
+                    <label className={styles.horasLabel} htmlFor="horas-reales">
+                      ¿Cuántas horas tardaste en completar esta tarea?
+                    </label>
+                    <input
+                      id="horas-reales"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      className={styles.horasInput}
+                      value={horasReales}
+                      onChange={(e) => setHorasReales(e.target.value)}
+                      placeholder="ej. 3.5"
+                      disabled={saving}
+                    />
+                  </div>
+                )}
 
                 {saveError && <p className={styles.saveError}>{saveError}</p>}
               </div>
@@ -527,7 +629,8 @@ export default function SprintScreen() {
                   disabled={
                     saving ||
                     editingStatus === selectedTask.idEstado ||
-                    selectedTask.idEstado === 3
+                    selectedTask.idEstado === 3 ||
+                    (editingStatus === 3 && horasReales === "")
                   }
                 >
                   {saving ? "Guardando..." : "Guardar cambios"}

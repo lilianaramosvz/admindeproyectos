@@ -130,8 +130,27 @@ async function patchJson(path, body) {
   return text ? JSON.parse(text) : null;
 }
 
-export function updateTaskStatus(taskId, taskData) {
-  return patchJson(`/api/tasks/${taskId}/status`, taskData);
+async function patchQuery(path) {
+  const headers = {};
+  try {
+    const token = localStorage.getItem("authToken");
+    if (token) headers.Authorization = `Bearer ${token}`;
+  } catch (e) {}
+  console.log("[patchQuery] →", `${BASE_URL}${path}`, { headers });
+  const res = await fetch(`${BASE_URL}${path}`, { method: "PATCH", headers });
+  const text = await res.text();
+  console.log("[patchQuery] ←", res.status, res.statusText, text);
+  if (!res.ok)
+    throw new Error(`Error ${res.status} al actualizar ${path}: ${text}`);
+  return text ? JSON.parse(text) : null;
+}
+
+export function updateTaskStatus(taskId, idEstado) {
+  return patchQuery(`/api/tasks/${taskId}/status?statusId=${idEstado}`);
+}
+
+export function updateRealHours(taskId, horas) {
+  return patchQuery(`/api/tasks/${taskId}/horas-reales?horas=${horas}`);
 }
 
 export function loginUser(correo, password) {

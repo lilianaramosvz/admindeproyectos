@@ -78,8 +78,14 @@ export default function BacklogPanel() {
         </button>
 
         {showFilter && (
-          <div className={styles.filterDropdown}>
+          <div
+            className={styles.filterDropdown}
+            role="listbox"
+            aria-label="Filtrar por sprint"
+          >
             <button
+              role="option"
+              aria-selected={selectedSprint === "todos"}
               className={
                 selectedSprint === "todos"
                   ? styles.filterOptionActive
@@ -90,11 +96,18 @@ export default function BacklogPanel() {
                 setShowFilter(false);
               }}
             >
-              Todos los sprints
+              <span className={styles.filterOptionLabel}>
+                Todos los sprints
+              </span>
+              <span className={styles.filterOptionCheck}>
+                {selectedSprint === "todos" ? "✓" : ""}
+              </span>
             </button>
             {availableSprints.map((sprint) => (
               <button
                 key={sprint}
+                role="option"
+                aria-selected={selectedSprint === sprint}
                 className={
                   selectedSprint === sprint
                     ? styles.filterOptionActive
@@ -105,7 +118,10 @@ export default function BacklogPanel() {
                   setShowFilter(false);
                 }}
               >
-                {sprint}
+                <span className={styles.filterOptionLabel}>{sprint}</span>
+                <span className={styles.filterOptionCheck}>
+                  {selectedSprint === sprint ? "✓" : ""}
+                </span>
               </button>
             ))}
           </div>
@@ -148,7 +164,7 @@ export default function BacklogPanel() {
                 <div>{task.hours}</div>
                 <div className={styles.assignee}>
                   <Avatar initials={task.assignee} />
-                  {task.name}
+                  <span className={styles.assigneeName}>{task.name}</span>
                 </div>
                 <div>{task.sprint}</div>
               </div>

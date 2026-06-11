@@ -45,6 +45,8 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
+    sessionStorage.removeItem("selectedProjectId");
+    sessionStorage.removeItem("selectedSprintId");
   };
 
   return (
