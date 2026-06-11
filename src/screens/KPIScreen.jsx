@@ -17,6 +17,10 @@ import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import { useRealHoursByUser } from "../hooks/useRealHoursByUser";
 import { getActiveProjects, getSprintsByProject } from "../services/api";
 import { useSelection } from "../context/SelectionContext";
+import {
+  filterSelectableSprints,
+  getSelectableSprintId,
+} from "../utils/sprints";
 
 import styles from "../styles/screens/KPIScreen.module.css";
 
@@ -90,13 +94,14 @@ export default function KPIScreen() {
         if (!isMounted) return;
         const list = Array.isArray(data) ? data : [];
 
-        const normalized = list.map((s) => ({ ...s, id: s.idSprint ?? s.id }));
+        const normalized = filterSelectableSprints(list).map((s) => ({
+          ...s,
+          id: s.idSprint ?? s.id,
+        }));
         setAvailableSprints(normalized);
         setSelectedSprintId((current) => {
           if (normalized.length === 0) return null;
-          if (current != null && normalized.some((s) => s.id === current))
-            return current;
-          return normalized[0].id;
+          return getSelectableSprintId(normalized, current);
         });
       })
       .catch(() => {

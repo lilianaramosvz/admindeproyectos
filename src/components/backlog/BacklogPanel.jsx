@@ -15,6 +15,7 @@ import {
   Timer,
 } from "lucide-react";
 import { useBacklogTasks } from "../../hooks/useBacklogTasks";
+import { isExcludedSprintLabel } from "../../utils/sprints";
 import taskStyles from "../../styles/screens/TasksScreen.module.css";
 
 function formatDate(dateStr) {
@@ -35,11 +36,13 @@ export default function BacklogPanel() {
 
   const availableSprints = useMemo(() => {
     const sprints = [...new Set(tasks.map((t) => t.sprint))];
-    return sprints.sort((a, b) => {
+    return sprints
+      .filter((sprint) => !isExcludedSprintLabel(sprint))
+      .sort((a, b) => {
       const numA = Number(a.replace(/\D/g, ""));
       const numB = Number(b.replace(/\D/g, ""));
       return numB - numA;
-    });
+      });
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {

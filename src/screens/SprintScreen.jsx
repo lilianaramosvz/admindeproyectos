@@ -12,6 +12,10 @@ import {
   updateRealHours,
 } from "../services/api";
 import { useSelection } from "../context/SelectionContext";
+import {
+  filterSelectableSprints,
+  getSelectableSprintId,
+} from "../utils/sprints";
 import styles from "../styles/screens/SprintScreen.module.css";
 
 const COLUMNS = [
@@ -90,8 +94,12 @@ export default function SprintScreen() {
       .then((data) => {
         if (!isMounted) return;
         const list = Array.isArray(data) ? data : [];
-        setSprints(list);
-        if (list.length > 0) {
+        const normalized = filterSelectableSprints(list).map((s) => ({
+          ...s,
+          idSprint: s.idSprint ?? s.id,
+        }));
+        setSprints(normalized);
+        if (normalized.length > 0) {
           const savedProjectId = Number(
             sessionStorage.getItem("selectedProjectId"),
           );
@@ -101,8 +109,10 @@ export default function SprintScreen() {
           const canRestore =
             savedProjectId === selectedProjectId &&
             savedSprintId &&
-            list.find((s) => s.idSprint === savedSprintId);
-          const chosenSprintId = canRestore ? savedSprintId : list[0].idSprint;
+            normalized.find((s) => s.idSprint === savedSprintId);
+          const chosenSprintId = canRestore
+            ? savedSprintId
+            : getSelectableSprintId(normalized);
           setSelectedSprintId(chosenSprintId);
           sessionStorage.setItem("selectedSprintId", chosenSprintId);
         }
