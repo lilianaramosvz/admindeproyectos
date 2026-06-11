@@ -17,6 +17,10 @@ import {
   updateTaskStatus,
   updateRealHours,
 } from "../services/api";
+import {
+  filterSelectableSprints,
+  getSelectableSprintId,
+} from "../utils/sprints";
 import styles from "../styles/screens/TasksScreen.module.css";
 
 const COLUMNS = [
@@ -95,10 +99,10 @@ export default function TasksScreen() {
     if (!effectiveProjectId) return;
     getSprintsByProject(effectiveProjectId)
       .then((data) => {
-        const sprints = Array.isArray(data)
-          ? data.map((s) => ({ ...s, id: s.idSprint ?? s.id }))
-          : [];
+        const sprints = filterSelectableSprints(Array.isArray(data) ? data : [])
+          .map((s) => ({ ...s, id: s.idSprint ?? s.id }));
         setAvailableSprints(sprints);
+        setSelectedSprintId((current) => getSelectableSprintId(sprints, current));
       })
       .catch(() => setAvailableSprints([]));
   }, [effectiveProjectId]);
