@@ -5,12 +5,16 @@ const normalizeSprintText = (value) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "");
 
-export const isExcludedSprintLabel = (value) =>
-  normalizeSprintText(value) === "sprint6";
+const MAX_SELECTABLE_SPRINT_ID = 4;
+
+export const isExcludedSprintLabel = (value) => {
+  const normalized = normalizeSprintText(value);
+  return normalized === "sprint5" || normalized === "sprint6";
+};
 
 export const isSelectableSprint = (sprint) => {
   const sprintId = Number(sprint?.idSprint ?? sprint?.id);
-  if (Number.isFinite(sprintId) && sprintId === 6) {
+  if (Number.isFinite(sprintId) && sprintId > MAX_SELECTABLE_SPRINT_ID) {
     return false;
   }
 

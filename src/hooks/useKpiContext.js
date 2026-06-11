@@ -14,19 +14,19 @@ const toNumberOrNull = (value) => {
 const getLatestSprint = (sprints) => {
   if (!Array.isArray(sprints) || sprints.length === 0) return null;
 
-  const sprint3 = sprints.find((sprint) => Number(sprint?.id) === 3);
-  if (sprint3) return sprint3;
+  const sprint4 = sprints.find((sprint) => Number(sprint?.id) === 4);
+  if (sprint4) return sprint4;
 
   // Fallback por nombre si el backend no entrega id numérico consistente
-  const sprint3ByName = sprints.find((sprint) => {
+  const sprint4ByName = sprints.find((sprint) => {
     const name = String(sprint?.nombre ?? "")
       .trim()
       .toLowerCase();
-    return name === "sprint 3";
+    return name === "sprint 4";
   });
-  if (sprint3ByName) return sprint3ByName;
+  if (sprint4ByName) return sprint4ByName;
 
-  // Si no existe Sprint 3, retornar el sprint con menor ID
+  // Si no existe Sprint 4, retornar el sprint con menor ID
   return [...sprints].sort((left, right) => {
     const leftId = Number(left?.id);
     const rightId = Number(right?.id);

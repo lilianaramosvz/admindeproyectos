@@ -21,7 +21,7 @@ const USER_COLORS = [
   "color-mix(in srgb, var(--aqua) 75%, white 25%)",
 ];
 
-const VISIBLE_SPRINT_IDS = [0, 1, 2, 3];
+const VISIBLE_SPRINT_IDS = [0, 1, 2, 3, 4];
 
 function HistoryTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;

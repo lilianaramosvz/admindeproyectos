@@ -5,6 +5,7 @@ import { useKpis } from "../hooks/useKpis";
 import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
+import { useSprintCompletedTasks } from "../hooks/useSprintCompletedTasks";
 import { useAuth } from "../context/AuthContext";
 import { useSelection } from "../context/SelectionContext";
 import SprintBoard from "../components/dashboard/SprintBoard";
@@ -32,6 +33,7 @@ export default function Dashboard() {
     useSelection();
   const effectiveSprintId = sharedSprintId ?? sprintId;
   const effectiveSprintName = sharedSprintName || sprintName;
+  const sprintCompletedTasks = useSprintCompletedTasks(effectiveSprintId);
 
   const teamName = user?.idEquipo ?? "Equipo";
   const { kpis, loading, error } = useKpis({
@@ -43,6 +45,7 @@ export default function Dashboard() {
   const { kpisForCards } = useKpiCardValues({
     kpis,
     complianceByUser,
+    sprintCompletedTasks,
   });
 
   if (contextLoading || loading) {

@@ -14,8 +14,12 @@ import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
+import { useSprintCompletedTasks } from "../hooks/useSprintCompletedTasks";
 import { useRealHoursByUser } from "../hooks/useRealHoursByUser";
-import { getActiveProjects, getSprintsByProject } from "../services/api";
+import {
+  getActiveProjects,
+  getSprintsByProject,
+} from "../services/api";
 import { useSelection } from "../context/SelectionContext";
 import {
   filterSelectableSprints,
@@ -52,6 +56,7 @@ export default function KPIScreen() {
 
   const effectiveProjectId = selectedProjectId ?? projectId;
   const effectiveSprintId = selectedSprintId ?? sprintId;
+  const sprintCompletedTasks = useSprintCompletedTasks(effectiveSprintId);
 
   // Cargar proyectos activos al montar el componente
   useEffect(() => {
@@ -182,6 +187,7 @@ export default function KPIScreen() {
       precisionByUser,
       precisionLoading,
       complianceByUser,
+      sprintCompletedTasks,
     });
 
   if (contextLoading || loading) {

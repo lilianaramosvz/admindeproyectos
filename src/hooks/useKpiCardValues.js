@@ -6,6 +6,7 @@ export function useKpiCardValues({
   precisionByUser = [],
   precisionLoading,
   complianceByUser = [],
+  sprintCompletedTasks = null,
 }) {
   const precisionValueFromChart = useMemo(() => {
     if (!precisionByUser || precisionByUser.length === 0) {
@@ -28,6 +29,10 @@ export function useKpiCardValues({
   }, [precisionByUser]);
 
   const totalCompletedTasks = useMemo(() => {
+    if (Number.isFinite(sprintCompletedTasks)) {
+      return sprintCompletedTasks;
+    }
+
     if (!complianceByUser || complianceByUser.length === 0) {
       return 0;
     }
@@ -36,7 +41,7 @@ export function useKpiCardValues({
       const completed = Number(item?.completed);
       return Number.isFinite(completed) ? acc + completed : acc;
     }, 0);
-  }, [complianceByUser]);
+  }, [complianceByUser, sprintCompletedTasks]);
 
   const kpisForCards = useMemo(() => {
     if (!kpis || kpis.length === 0) {
