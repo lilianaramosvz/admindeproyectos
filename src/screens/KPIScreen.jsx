@@ -1,4 +1,3 @@
-//frontend\src\screens\KPIScreen.jsx
 import MainLayout from "../components/layout/MainLayout";
 import { useEffect, useMemo, useRef, useState } from "react";
 import KpiCard from "../components/dashboard/KpiCard";
@@ -9,24 +8,21 @@ import TasksByUserChart from "../components/charts/TasksByUserChart";
 import RealHoursByUser from "../components/charts/RealHoursByUser";
 import TasksHistoryChart from "../components/charts/TasksHistoryChart";
 import RealHoursHistoryChart from "../components/charts/RealHoursHistoryChart";
+import TotalsPerDevChart from "../components/charts/TotalsPerDevChart";
 import { useKpis } from "../hooks/useKpis";
 import { useKpiCardValues } from "../hooks/useKpiCardValues";
 import { useKpiContext } from "../hooks/useKpiContext";
 import { usePrecisionEstimationByUser } from "../hooks/usePrecisionEstimationByUser";
 import { useTaskComplianceByUser } from "../hooks/useTaskComplianceByUser";
 import { useSprintCompletedTasks } from "../hooks/useSprintCompletedTasks";
+import { useSprintHistoryByUser } from "../hooks/useSprintHistoryByUser";
 import { useRealHoursByUser } from "../hooks/useRealHoursByUser";
-import {
-  getActiveProjects,
-  getSprintsByProject,
-} from "../services/api";
+import { getActiveProjects, getSprintsByProject } from "../services/api";
 import { useSelection } from "../context/SelectionContext";
-import {
-  filterSelectableSprints,
-  getSelectableSprintId,
-} from "../utils/sprints";
-
+import { filterSelectableSprints, getSelectableSprintId } from "../utils/sprints";
 import styles from "../styles/screens/KPIScreen.module.css";
+
+const ALL_SPRINTS_ID = "all";
 
 export default function KPIScreen() {
   const {
@@ -48,17 +44,21 @@ export default function KPIScreen() {
   const [selectedSprintId, setSelectedSprintId] = useState(null);
   const [isSprintMenuOpen, setIsSprintMenuOpen] = useState(false);
   const sprintDropdownRef = useRef(null);
+
   const {
     sprintId: sharedSprintId,
     setSprintId: setSharedSprintId,
     setSprintName: setSharedSprintName,
   } = useSelection();
 
+  const isAllSprints = selectedSprintId === ALL_SPRINTS_ID;
   const effectiveProjectId = selectedProjectId ?? projectId;
-  const effectiveSprintId = selectedSprintId ?? sprintId;
+  const effectiveSprintId = isAllSprints
+    ? (sprintId ?? null)
+    : (selectedSprintId ?? sprintId);
+
   const sprintCompletedTasks = useSprintCompletedTasks(effectiveSprintId);
 
-  // Cargar proyectos activos al montar el componente
   useEffect(() => {
     let isMounted = true;
     getActiveProjects()
@@ -69,18 +69,14 @@ export default function KPIScreen() {
       .catch(() => {
         if (isMounted) setAvailableProjects([]);
       });
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
-  // Inicializar selectedProjectId una vez que los proyectos están disponibles
   useEffect(() => {
     if (projectId == null) return;
     setSelectedProjectId((current) => current ?? projectId);
   }, [projectId]);
 
-  // Inicializar selectedSprintId una vez que el contexto esté listo
   useEffect(() => {
     if (sprintId == null) return;
     setSelectedSprintId((current) => current ?? sharedSprintId ?? sprintId);
@@ -98,13 +94,13 @@ export default function KPIScreen() {
       .then((data) => {
         if (!isMounted) return;
         const list = Array.isArray(data) ? data : [];
-
         const normalized = filterSelectableSprints(list).map((s) => ({
           ...s,
           id: s.idSprint ?? s.id,
         }));
         setAvailableSprints(normalized);
         setSelectedSprintId((current) => {
+          if (current === ALL_SPRINTS_ID) return current;
           if (normalized.length === 0) return null;
           return getSelectableSprintId(normalized, current);
         });
@@ -112,24 +108,17 @@ export default function KPIScreen() {
       .catch(() => {
         if (isMounted) setAvailableSprints([]);
       });
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, [effectiveProjectId]);
 
   useEffect(() => {
     if (!isProjectMenuOpen) return;
-
     function handlePointerDown(event) {
-      if (!projectDropdownRef.current?.contains(event.target)) {
-        setIsProjectMenuOpen(false);
-      }
+      if (!projectDropdownRef.current?.contains(event.target)) setIsProjectMenuOpen(false);
     }
-
     function handleEscape(event) {
       if (event.key === "Escape") setIsProjectMenuOpen(false);
     }
-
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleEscape);
     return () => {
@@ -140,17 +129,12 @@ export default function KPIScreen() {
 
   useEffect(() => {
     if (!isSprintMenuOpen) return;
-
     function handlePointerDown(event) {
-      if (!sprintDropdownRef.current?.contains(event.target)) {
-        setIsSprintMenuOpen(false);
-      }
+      if (!sprintDropdownRef.current?.contains(event.target)) setIsSprintMenuOpen(false);
     }
-
     function handleEscape(event) {
       if (event.key === "Escape") setIsSprintMenuOpen(false);
     }
-
     document.addEventListener("mousedown", handlePointerDown);
     document.addEventListener("keydown", handleEscape);
     return () => {
@@ -165,15 +149,17 @@ export default function KPIScreen() {
   }, [availableProjects, effectiveProjectId, projectName]);
 
   const selectedSprintName = useMemo(() => {
+    if (isAllSprints) return "Todos los sprints";
     const selected = availableSprints.find((s) => s.id === effectiveSprintId);
     return selected?.nombre || sprintName;
-  }, [availableSprints, effectiveSprintId, sprintName]);
+  }, [availableSprints, effectiveSprintId, sprintName, isAllSprints]);
 
   const { kpis, loading, error } = useKpis({
     userId,
     projectId: effectiveProjectId ?? projectId,
     sprintId: effectiveSprintId,
   });
+
   const { data: complianceByUser } = useTaskComplianceByUser(effectiveSprintId);
   const {
     data: precisionByUser,
@@ -181,14 +167,53 @@ export default function KPIScreen() {
     error: precisionError,
   } = usePrecisionEstimationByUser(effectiveSprintId);
   const { totalRealHours } = useRealHoursByUser(effectiveSprintId);
-  const { kpisForCards, precisionValueFromChart, totalCompletedTasks } =
+  const { sprints: tasksHistorySprints } = useSprintHistoryByUser("tasks");
+  const { sprints: hoursHistorySprints } = useSprintHistoryByUser("hours");
+
+  const { kpisForCards, summaryCards, precisionValueFromChart, totalCompletedTasks } =
     useKpiCardValues({
       kpis,
       precisionByUser,
       precisionLoading,
       complianceByUser,
       sprintCompletedTasks,
+      tasksHistorySprints,
+      hoursHistorySprints,
     });
+
+  const taskTotalsPerDev = useMemo(() => {
+    if (!Array.isArray(tasksHistorySprints) || tasksHistorySprints.length === 0) return [];
+    const userNames = new Set();
+    tasksHistorySprints.forEach((row) => {
+      Object.keys(row ?? {})
+        .filter((k) => k !== "sprintName" && k !== "sprintId")
+        .forEach((k) => userNames.add(k));
+    });
+    return Array.from(userNames).map((userName) => ({
+      userName,
+      total: tasksHistorySprints.reduce((acc, row) => {
+        const v = Number(row?.[userName]);
+        return Number.isFinite(v) ? acc + v : acc;
+      }, 0),
+    }));
+  }, [tasksHistorySprints]);
+
+  const hourTotalsPerDev = useMemo(() => {
+    if (!Array.isArray(hoursHistorySprints) || hoursHistorySprints.length === 0) return [];
+    const userNames = new Set();
+    hoursHistorySprints.forEach((row) => {
+      Object.keys(row ?? {})
+        .filter((k) => k !== "sprintName" && k !== "sprintId")
+        .forEach((k) => userNames.add(k));
+    });
+    return Array.from(userNames).map((userName) => ({
+      userName,
+      total: hoursHistorySprints.reduce((acc, row) => {
+        const v = Number(row?.[userName]);
+        return Number.isFinite(v) ? acc + v : acc;
+      }, 0),
+    }));
+  }, [hoursHistorySprints]);
 
   if (contextLoading || loading) {
     return <div className={styles.container}>Cargando KPIs...</div>;
@@ -200,12 +225,12 @@ export default function KPIScreen() {
         <div className={styles.header}>
           <h1>Indicadores Clave de Desempeño</h1>
           <p className={styles.intro}>
-            Visualiza y analiza los KPI's de tus proyectos para ver el desempeño
-            de tu equipo
+            Visualiza y analiza los KPI's de tus proyectos para ver el desempeño de tu equipo
           </p>
         </div>
 
         <div className={styles.selectors}>
+          {/* SELECTOR PROYECTO */}
           <div className={styles.selectorGroup}>
             <label className={styles.selectorLabel}>Proyecto</label>
             <span className={styles.sprintPicker} ref={projectDropdownRef}>
@@ -218,23 +243,15 @@ export default function KPIScreen() {
                 aria-haspopup="listbox"
               >
                 <span className={styles.sprintButtonLabel}>
-                  {availableProjects.length === 0
-                    ? "Cargando..."
-                    : selectedProjectName}
+                  {availableProjects.length === 0 ? "Cargando..." : selectedProjectName}
                 </span>
                 <span
                   className={`${styles.sprintChevron} ${isProjectMenuOpen ? styles.sprintChevronOpen : ""}`}
                   aria-hidden="true"
-                >
-                  ▾
-                </span>
+                >▾</span>
               </button>
               {isProjectMenuOpen && availableProjects.length > 0 && (
-                <div
-                  className={styles.sprintMenu}
-                  role="listbox"
-                  aria-label="Proyectos disponibles"
-                >
+                <div className={styles.sprintMenu} role="listbox" aria-label="Proyectos disponibles">
                   {availableProjects.map((p) => {
                     const isSelected = p.id === effectiveProjectId;
                     return (
@@ -250,13 +267,8 @@ export default function KPIScreen() {
                           setIsProjectMenuOpen(false);
                         }}
                       >
-                        <span className={styles.sprintOptionLabel}>
-                          {p.nombre}
-                        </span>
-                        <span
-                          className={styles.sprintOptionCheck}
-                          aria-hidden="true"
-                        >
+                        <span className={styles.sprintOptionLabel}>{p.nombre}</span>
+                        <span className={styles.sprintOptionCheck} aria-hidden="true">
                           {isSelected ? "✓" : ""}
                         </span>
                       </button>
@@ -267,6 +279,7 @@ export default function KPIScreen() {
             </span>
           </div>
 
+          {/* SELECTOR SPRINT */}
           <div className={styles.selectorGroup}>
             <label className={styles.selectorLabel}>Sprint</label>
             <span className={styles.sprintPicker} ref={sprintDropdownRef}>
@@ -279,25 +292,34 @@ export default function KPIScreen() {
                 aria-haspopup="listbox"
               >
                 <span className={styles.sprintButtonLabel}>
-                  {availableSprints.length === 0
-                    ? "Cargando..."
-                    : selectedSprintName}
+                  {availableSprints.length === 0 ? "Cargando..." : selectedSprintName}
                 </span>
                 <span
                   className={`${styles.sprintChevron} ${isSprintMenuOpen ? styles.sprintChevronOpen : ""}`}
                   aria-hidden="true"
-                >
-                  ▾
-                </span>
+                >▾</span>
               </button>
               {isSprintMenuOpen && availableSprints.length > 0 && (
-                <div
-                  className={styles.sprintMenu}
-                  role="listbox"
-                  aria-label="Sprints disponibles"
-                >
+                <div className={styles.sprintMenu} role="listbox" aria-label="Sprints disponibles">
+                  {/* OPCIÓN TODOS LOS SPRINTS */}
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={isAllSprints}
+                    className={`${styles.sprintOption} ${isAllSprints ? styles.sprintOptionSelected : ""}`}
+                    onClick={() => {
+                      setSelectedSprintId(ALL_SPRINTS_ID);
+                      setIsSprintMenuOpen(false);
+                    }}
+                  >
+                    <span className={styles.sprintOptionLabel}>Todos los sprints</span>
+                    <span className={styles.sprintOptionCheck} aria-hidden="true">
+                      {isAllSprints ? "✓" : ""}
+                    </span>
+                  </button>
+
                   {availableSprints.map((s) => {
-                    const isSelected = s.id === effectiveSprintId;
+                    const isSelected = s.id === effectiveSprintId && !isAllSprints;
                     return (
                       <button
                         key={s.id}
@@ -312,13 +334,8 @@ export default function KPIScreen() {
                           setIsSprintMenuOpen(false);
                         }}
                       >
-                        <span className={styles.sprintOptionLabel}>
-                          {s.nombre}
-                        </span>
-                        <span
-                          className={styles.sprintOptionCheck}
-                          aria-hidden="true"
-                        >
+                        <span className={styles.sprintOptionLabel}>{s.nombre}</span>
+                        <span className={styles.sprintOptionCheck} aria-hidden="true">
                           {isSelected ? "✓" : ""}
                         </span>
                       </button>
@@ -330,129 +347,135 @@ export default function KPIScreen() {
           </div>
         </div>
 
-        {contextError ? (
-          <div className={styles.error}>{contextError}</div>
-        ) : null}
+        {contextError ? <div className={styles.error}>{contextError}</div> : null}
         {error ? <div className={styles.error}>{error}</div> : null}
 
-        {/* MAIN KPIs */}
-        <div className={styles.kpiGrid}>
-          {kpisForCards
-            .filter(({ key }) => key !== "precision")
-            .map(({ key: kpiKey, ...kpiProps }) => {
-              const cardProps =
-                kpiKey === "realHours"
-                  ? {
-                      ...kpiProps,
-                      value: `${Math.round(totalRealHours)} horas por equipo`,
-                    }
-                  : kpiProps;
-
-              return <KpiCard key={kpiKey} {...cardProps} />;
-            })}
-        </div>
-
-        <div className={styles.charts}>
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeader}>
-              <div>
-                <h3>Tareas completadas por sprint</h3>
-                <p className={styles.chartMeta}>
-                  Tareas completadas por usuario en cada sprint
-                </p>
-              </div>
+        {/* ── SPRINT ESPECÍFICO ── */}
+        {!isAllSprints && (
+          <>
+            <div className={styles.kpiGrid}>
+              {kpisForCards
+                .filter(({ key }) => key !== "precision")
+                .map(({ key: kpiKey, ...kpiProps }) => {
+                  const cardProps =
+                    kpiKey === "realHours"
+                      ? { ...kpiProps, value: `${Math.round(totalRealHours)} horas por equipo` }
+                      : kpiProps;
+                  return <KpiCard key={kpiKey} {...cardProps} />;
+                })}
             </div>
-            <TasksHistoryChart />
-          </div>
 
-          <div className={styles.chartCard}>
-            <div className={styles.chartHeader}>
-              <div>
-                <h3>Horas reales por sprint</h3>
-                <p className={styles.chartMeta}>
-                  Horas trabajadas por usuario en cada sprint
-                </p>
-              </div>
+            <div className={styles.charts}>
+              {kpis
+                .filter((kpi) => kpi.key !== "compliance")
+                .map((kpi) => (
+                  <div key={kpi.key} className={styles.chartCard}>
+                    <div className={styles.chartHeader}>
+                      <div>
+                        <h3>{kpi.title}</h3>
+                        <p className={styles.chartMeta}>
+                          {kpi.key === "duration"
+                            ? "Comparativo de tiempo real del sprint vs tiempo planificado"
+                            : kpi.key === "precision"
+                              ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
+                              : kpi.key === "cycleTime"
+                                ? "Total de tareas completadas por cada integrante en el sprint activo"
+                                : kpi.hasHistory
+                                  ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
+                                  : "Sin historial: mostrando valor actual"}
+                        </p>
+                      </div>
+                      <span
+                        className={`${styles.chartValue} ${kpi.key === "duration" ? styles.chartValueDuration : ""} ${
+                          kpi.key === "duration" && /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
+                            ? styles.chartValueDurationZero : ""
+                        }`}
+                      >
+                        {kpi.key === "cycleTime"
+                          ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
+                          : kpi.key === "realHours"
+                            ? `${Math.round(totalRealHours)} hrs por equipo`
+                            : kpi.key === "precision"
+                              ? precisionLoading ? "..." : (precisionValueFromChart ?? "Sin datos")
+                              : kpi.value}
+                      </span>
+                    </div>
+                    {kpi.key === "cycleTime" ? (
+                      <TasksByUserChart data={complianceByUser} color={kpi.color} />
+                    ) : kpi.key === "precision" ? (
+                      <>
+                        {precisionError ? <div className={styles.error}>{precisionError}</div> : null}
+                        {precisionLoading ? (
+                          <div className={styles.chartMeta}>Cargando precisión de estimación...</div>
+                        ) : (
+                          <PrecisionEstimationChart data={precisionByUser} color={kpi.color} />
+                        )}
+                      </>
+                    ) : kpi.key === "duration" ? (
+                      <SprintDurationChart sprintId={effectiveSprintId} color={kpi.color} />
+                    ) : kpi.key === "realHours" ? (
+                      <RealHoursByUser sprintId={effectiveSprintId} color={kpi.color} />
+                    ) : (
+                      <MiniChart data={kpi.chartData} color={kpi.color} unit={kpi.unit} />
+                    )}
+                  </div>
+                ))}
             </div>
-            <RealHoursHistoryChart />
-          </div>
+          </>
+        )}
 
-          {kpis
-            .filter((kpi) => kpi.key !== "compliance")
-            .map((kpi) => (
-              <div key={kpi.key} className={styles.chartCard}>
+        {/* ── TODOS LOS SPRINTS ── */}
+        {isAllSprints && (
+          <>
+            <div className={styles.kpiGrid}>
+              {summaryCards.map(({ key, ...cardProps }) => (
+                <KpiCard key={key} {...cardProps} />
+              ))}
+            </div>
+
+            <div className={styles.charts}>
+              <div className={styles.chartCard}>
                 <div className={styles.chartHeader}>
                   <div>
-                    <h3>{kpi.title}</h3>
-                    <p className={styles.chartMeta}>
-                      {kpi.key === "duration"
-                        ? "Comparativo de tiempo real del sprint vs tiempo planificado"
-                        : kpi.key === "precision"
-                          ? "Comparativo de horas estimadas vs horas reales por usuario en el sprint activo"
-                          : kpi.key === "cycleTime"
-                            ? "Total de tareas completadas por cada integrante en el sprint activo"
-                            : kpi.hasHistory
-                              ? `Histórico de ${kpi.chartData?.length ?? 0} mediciones`
-                              : "Sin historial: mostrando valor actual"}
-                    </p>
+                    <h3>Tareas completadas por sprint</h3>
+                    <p className={styles.chartMeta}>Tareas completadas por usuario en cada sprint</p>
                   </div>
-                  <span
-                    className={`${styles.chartValue} ${kpi.key === "duration" ? styles.chartValueDuration : ""} ${
-                      kpi.key === "duration" &&
-                      /^0(?:\.0+)?%$/.test(String(kpi.value).trim())
-                        ? styles.chartValueDurationZero
-                        : ""
-                    }`}
-                  >
-                    {kpi.key === "cycleTime"
-                      ? `${totalCompletedTasks.toFixed(0)} tareas por equipo`
-                      : kpi.key === "realHours"
-                        ? `${Math.round(totalRealHours)} hrs por equipo`
-                        : kpi.key === "precision"
-                          ? precisionLoading
-                            ? "..."
-                            : (precisionValueFromChart ?? "Sin datos")
-                          : kpi.value}
-                  </span>
                 </div>
-                {kpi.key === "cycleTime" ? (
-                  <TasksByUserChart data={complianceByUser} color={kpi.color} />
-                ) : kpi.key === "precision" ? (
-                  <>
-                    {precisionError ? (
-                      <div className={styles.error}>{precisionError}</div>
-                    ) : null}
-                    {precisionLoading ? (
-                      <div className={styles.chartMeta}>
-                        Cargando precisión de estimación por usuario...
-                      </div>
-                    ) : (
-                      <PrecisionEstimationChart
-                        data={precisionByUser}
-                        color={kpi.color}
-                      />
-                    )}
-                  </>
-                ) : kpi.key === "duration" ? (
-                  <SprintDurationChart
-                    sprintId={effectiveSprintId}
-                    color={kpi.color}
-                  />
-                ) : kpi.key === "realHours" ? (
-                  <RealHoursByUser
-                    sprintId={effectiveSprintId}
-                    color={kpi.color}
-                  />
-                ) : (
-                  <MiniChart
-                    data={kpi.chartData}
-                    color={kpi.color}
-                    unit={kpi.unit}
-                  />
-                )}
+                <TasksHistoryChart />
               </div>
-            ))}
-        </div>
+
+              <div className={styles.chartCard}>
+                <div className={styles.chartHeader}>
+                  <div>
+                    <h3>Horas reales por sprint</h3>
+                    <p className={styles.chartMeta}>Horas trabajadas por usuario en cada sprint</p>
+                  </div>
+                </div>
+                <RealHoursHistoryChart />
+              </div>
+
+              <div className={styles.chartCard}>
+                <div className={styles.chartHeader}>
+                  <div>
+                    <h3>Total de tareas por desarrollador</h3>
+                    <p className={styles.chartMeta}>Tareas completadas acumuladas por integrante en todos los sprints</p>
+                  </div>
+                </div>
+                <TotalsPerDevChart data={taskTotalsPerDev} valueKey="total" unit=" tareas" />
+              </div>
+
+              <div className={styles.chartCard}>
+                <div className={styles.chartHeader}>
+                  <div>
+                    <h3>Total de horas por desarrollador</h3>
+                    <p className={styles.chartMeta}>Horas reales acumuladas por integrante en todos los sprints</p>
+                  </div>
+                </div>
+                <TotalsPerDevChart data={hourTotalsPerDev} valueKey="total" unit=" hrs" />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </MainLayout>
   );
